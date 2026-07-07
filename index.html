@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSC CGL RPG Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD3J1u9V90DDNEE0VciSMYvTExEvcGbOPI",
+            authDomain: "my-study-plan-2026.firebaseapp.com",
+            projectId: "my-study-plan-2026",
+            storageBucket: "my-study-plan-2026.firebasestorage.app",
+            messagingSenderId: "218072970563",
+            appId: "1:218072970563:web:a308e83e7697a766956bf6",
+            measurementId: "G-YXJBWXJ852"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const docRef = doc(db, "tracker", "ssc-data");
+
+        const syllabus = {
+            "MATHS (Quant)": ["Mixture", "Alligation", "Average", "Simplification", "Surds & Indices", "Number System", "AP & GP", "Algebra", "Quadratic Equation", "Trigonometry", "Max & Min", "Height & Distance", "Geometry", "Mensuration", "Coordinate Geometry", "Probability", "DI", "Statics", "HCF & LCM", "Percentage", "P&L", "Discount", "SI", "CI", "Time & Work", "Wage", "Pipe & Cistern", "Time & Speed", "Train", "Race", "Circular Motion", "Boat", "Ratio", "Proportional", "Ages", "Partnership"],
+            "REASONING": ["Syllogism", "Analogy", "Letter Series", "Fig Series", "Coding Decoding", "Blood Relation", "Sitting Arrangement", "Number Series", "Alphabet Series", "Dot Situation", "Missing Number", "Statement & Argument", "Cause & Effect", "Statement & Assumption", "Statement Conclusion", "Course of Action", "Data Sufficiency", "Coded Inequality", "Decision Making", "Puzzle", "Input Output"],
+            "SCIENCE": ["Periodic Table", "Metal & Nonmetal", "Atomic Structure", "Water", "Carbon & Compound", "Acid Base", "Soap & Detergent", "Matter", "Radioactivity", "Physical Change", "Polymer", "Chemical Reaction", "Light", "Mirror", "Lens", "Primary Colour", "Wave", "Sound", "Force & Motion", "Gravitation", "Projectile", "Satellite", "Work & Power", "Heat & Temp", "Electricity", "Physics Basics", "Biology"]
+        };
+
+        let progressData = {};
+
+        async function load() {
+            const snap = await getDoc(docRef);
+            if (snap.exists()) progressData = snap.data().tasks || {};
+            render();
+        }
+
+        window.toggleTask = async function(task) {
+            progressData[task] = !progressData[task];
+            await setDoc(docRef, { tasks: progressData });
+            render();
+        }
+
+        function render() {
+            const container = document.getElementById('app');
+            container.innerHTML = '';
+            let total = 0, done = 0;
+
+            for (const [subject, items] of Object.entries(syllabus)) {
+                container.innerHTML += `<h2 class="text-yellow-400 font-bold mt-8 mb-4 border-b border-yellow-700 pb-1">⚡ ${subject}</h2>`;
+                items.forEach(item => {
+                    total++;
+                    if (progressData[item]) done++;
+                    container.innerHTML += `
+                        <button onclick="toggleTask('${item}')" class="w-full text-left p-3 mb-2 rounded-lg border transition ${progressData[item] ? 'bg-green-900/40 border-green-500 text-green-200' : 'bg-slate-800 border-slate-700 hover:border-yellow-500'}">
+                            ${progressData[item] ? '⚔️' : '🛡️'} ${item}
+                        </button>`;
+                });
+            }
+            
+            const pct = Math.round((done/total)*100);
+            let rank = pct < 30 ? "Novice" : pct < 70 ? "Scholar" : "CGL Master";
+            document.getElementById('bar').style.width = pct + "%";
+            document.getElementById('pct').innerText = `${pct}% (${rank})`;
+        }
+        
+        load();
+    </script>
+</head>
+<body class="bg-slate-950 text-white p-4 font-mono">
+    <div class="max-w-md mx-auto">
+        <header class="text-center py-6">
+            <h1 class="text-3xl font-bold text-yellow-400">SSC CGL QUEST</h1>
+            <p class="text-xs text-slate-400">MISSION: 90 DAYS TO MASTERY</p>
+        </header>
+        <div class="bg-slate-900 p-5 rounded-2xl border-2 border-yellow-600 shadow-[0_0_15px_rgba(202,138,4,0.3)]">
+            <div class="flex justify-between mb-2 text-sm"><span>LEVEL PROGRESS</span><span id="pct">0%</span></div>
+            <div class="w-full bg-slate-800 h-6 rounded-lg overflow-hidden border border-slate-600">
+                <div id="bar" class="bg-yellow-500 h-full transition-all duration-1000" style="width:0%"></div>
+            </div>
+        </div>
+        <div id="app"></div>
+    </div>
+</body>
+</html>
