@@ -104,6 +104,40 @@
         .gap-box { background: #2d1822; border-left: 4px solid var(--accent-red); padding: 12px; font-size: 11px; line-height: 1.5; margin-top: 15px; border-radius: 4px; }
         .gap-title { font-weight: bold; color: #ff6b6b; margin-bottom: 5px; text-transform: uppercase; }
         .gap-box ul { padding-left: 15px; margin-top: 4px; color: #ddd; }
+
+        /* --- Add Topic / Upload Form --- */
+        .add-topic-box { background: #131A30; border: 1px dashed var(--accent-amber); border-radius: 4px; padding: 12px; margin-top: 14px; }
+        .add-topic-box h4 { font-size: 12px; color: var(--accent-amber); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        .add-topic-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .add-topic-grid input { padding: 7px; background: #000; border: 1px solid #444; color: #fff; font-family: inherit; font-size: 11px; border-radius: 2px; width: 100%; }
+        .add-topic-grid input:focus { border-color: var(--accent-amber); outline: none; }
+        .add-topic-full { grid-column: 1 / -1; }
+        .btn-add-topic { grid-column: 1 / -1; background: var(--accent-amber); color: #000; border: none; padding: 9px; font-weight: bold; font-family: 'Oswald', sans-serif; cursor: pointer; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; margin-top: 2px; }
+        .btn-add-topic:hover { background: #fff; }
+
+        /* --- Drag & Drop affordances --- */
+        .drag-handle { cursor: grab; color: #666; padding-right: 4px; user-select: none; }
+        .drag-handle:active { cursor: grabbing; }
+        tr.syllabus-row { cursor: grab; }
+        tr.syllabus-row.dragging { opacity: 0.4; }
+        tr.syllabus-row.custom-row td:first-child { color: #FFD27A !important; }
+        .btn-del-topic { background: transparent; border: 1px solid var(--accent-red); color: var(--accent-red); font-size: 10px; padding: 2px 6px; border-radius: 2px; cursor: pointer; margin-top: 4px; }
+        .btn-del-topic:hover { background: var(--accent-red); color: #fff; }
+
+        .task-item[draggable="true"] { cursor: grab; padding-right: 26px; }
+        .task-item[draggable="true"]:active { cursor: grabbing; }
+        .task-item.drag-ghost { opacity: 0.35; }
+        .task-item .task-drag-dot { position: absolute; right: 6px; top: 4px; font-size: 12px; color: #b8b0a0; }
+        .task-item.manual-task { background: rgba(58,134,200,0.08); }
+        .task-item.manual-task span::before { content: "➕ "; color: #3A86C8; font-weight: bold; }
+
+        .task-list.dropzone-active { outline: 2px dashed var(--paper-blue-line); outline-offset: 4px; background: rgba(58,134,200,0.06); }
+
+        .planner-controls-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        #trash-dropzone { border: 2px dashed var(--accent-red); color: var(--accent-red); font-size: 11px; padding: 7px 14px; border-radius: 4px; text-align: center; text-transform: uppercase; transition: all 0.15s ease; }
+        #trash-dropzone.dropzone-hot { background: var(--accent-red); color: #fff; transform: scale(1.05); }
+        .btn-generate { background: #27AE60; color: #fff; border: 1px solid #1e8449; padding: 8px 16px; font-size: 12px; cursor: pointer; text-transform: uppercase; font-weight: bold; }
+        .btn-generate:hover { background: #2ecc71; }
     </style>
 </head>
 <body>
@@ -192,15 +226,33 @@
                 <p style="font-size: 10px; color:#A0AABF; margin-top:6px; line-height: 1.3;">
                     * Updating any input live-shifts future task lengths, automatically generating dynamic multi-day remainder splices without losing checked data.
                 </p>
+                <p style="font-size: 10px; color:#A0AABF; margin-top:4px; line-height: 1.3;">
+                    * Drag any row using its <span class="drag-handle">⠿</span> handle and drop it onto a day card on the right to manually insert that topic into that day.
+                </p>
+
+                <div class="add-topic-box">
+                    <h4>⬆ Upload New Syllabus Topic</h4>
+                    <div class="add-topic-grid">
+                        <input type="text" id="new-topic-subject" list="subject-suggestions" placeholder="Subject name">
+                        <input type="text" id="new-topic-name" placeholder="Topic name" class="add-topic-full">
+                        <input type="number" id="new-topic-lec" placeholder="Lecture Hours" step="0.5" min="0">
+                        <input type="number" id="new-topic-qs" placeholder="Qs Count" min="0">
+                        <input type="number" id="new-topic-mpq" placeholder="Min/Q" step="0.1" min="0">
+                        <button class="btn-add-topic" onclick="addCustomTopic()">+ Add Topic To Syllabus</button>
+                    </div>
+                    <datalist id="subject-suggestions"></datalist>
+                </div>
             </div>
         </div>
 
         <div class="workspace">
             <div class="planner-controls">
                 <h2 class="cmd-head" style="font-size: 22px; border-bottom: 2px solid var(--accent-amber);">Day-by-Day Deployment</h2>
-                <div>
+                <div class="planner-controls-row">
+                    <div id="trash-dropzone" ondragover="handleTrashDragOver(event)" ondragleave="handleTrashDragLeave(event)" ondrop="handleTrashDrop(event)">🗑 Drag Task Here To Remove</div>
                     <button class="btn-action" onclick="jumpToToday()">Jump To Current Day</button>
                     <button class="btn-action" id="toggle-filter-btn" onclick="toggleRemainingFilter()">Show Outstanding Only</button>
+                    <button class="btn-generate" onclick="generatePlanNow()">⚙ Generate Plan</button>
                 </div>
             </div>
 
@@ -353,8 +405,14 @@
         let userDataState = {
             settings: { hours: 6, daysPerWeek: 6, startDate: "" },
             topicOverrides: {},
-            checks: {}
+            checks: {},
+            customTopics: [],
+            manualDayTasks: {},
+            removedAutoTasks: {}
         };
+
+        // Drag & Drop transient state
+        let dragPayload = null;
 
         window.addEventListener('DOMContentLoaded', () => {
             loadPrimaryFirebase();
@@ -437,12 +495,18 @@
                     userDataState = doc.data();
                     if (!userDataState.checks) userDataState.checks = {};
                     if (!userDataState.topicOverrides) userDataState.topicOverrides = {};
+                    if (!userDataState.customTopics) userDataState.customTopics = [];
+                    if (!userDataState.manualDayTasks) userDataState.manualDayTasks = {};
+                    if (!userDataState.removedAutoTasks) userDataState.removedAutoTasks = {};
                 } else {
                     const todayStr = new Date().toISOString().split('T')[0];
                     userDataState = {
                         settings: { hours: 6, daysPerWeek: 6, startDate: todayStr },
                         topicOverrides: {},
-                        checks: {}
+                        checks: {},
+                        customTopics: [],
+                        manualDayTasks: {},
+                        removedAutoTasks: {}
                     };
                     docRef.set(userDataState).catch(e => {
                         showSystemNotice("Permission Denied: Confirm Cloud Firestore rules configuration matches deployment criteria.");
@@ -462,12 +526,20 @@
             const localData = localStorage.getItem(`bak_plan_${activeUserId}`);
             if (localData) {
                 userDataState = JSON.parse(localData);
+                if (!userDataState.checks) userDataState.checks = {};
+                if (!userDataState.topicOverrides) userDataState.topicOverrides = {};
+                if (!userDataState.customTopics) userDataState.customTopics = [];
+                if (!userDataState.manualDayTasks) userDataState.manualDayTasks = {};
+                if (!userDataState.removedAutoTasks) userDataState.removedAutoTasks = {};
             } else {
                 const todayStr = new Date().toISOString().split('T')[0];
                 userDataState = {
                     settings: { hours: 6, daysPerWeek: 6, startDate: todayStr },
                     topicOverrides: {},
-                    checks: {}
+                    checks: {},
+                    customTopics: [],
+                    manualDayTasks: {},
+                    removedAutoTasks: {}
                 };
             }
             syncInterfaceSettings();
@@ -496,30 +568,108 @@
             document.getElementById('cfg-days-week').value = userDataState.settings.daysPerWeek || 6;
         }
 
+        function getCombinedSyllabus() {
+            return masterRawSyllabus.concat(userDataState.customTopics || []);
+        }
+
         function generateSyllabusConfigTable() {
             const tbody = document.getElementById('config-table-body');
             tbody.innerHTML = '';
-            
-            masterRawSyllabus.forEach(item => {
+
+            const combinedList = getCombinedSyllabus();
+
+            combinedList.forEach(item => {
+                const isCustom = !!item.isCustom;
                 const override = userDataState.topicOverrides[item.id] || {};
                 const lecVal = override.lec !== undefined ? override.lec : item.lec;
                 const qsVal = override.qs !== undefined ? override.qs : item.qs;
                 const mpqVal = override.mpq !== undefined ? override.mpq : item.mpq;
 
                 const tr = document.createElement('tr');
+                tr.className = 'syllabus-row' + (isCustom ? ' custom-row' : '');
+                tr.draggable = true;
+                tr.ondragstart = (ev) => handleSyllabusDragStart(ev, item.id, item.subject, item.topic, lecVal, qsVal, mpqVal);
+                tr.ondragend = (ev) => { tr.classList.remove('dragging'); };
+                tr.addEventListener('dragstart', () => tr.classList.add('dragging'));
+
                 tr.innerHTML = `
-                    <td style="color:#FFF;"><strong>[${item.subject}]</strong><br>${item.topic}</td>
+                    <td style="color:#FFF;">
+                        <span class="drag-handle" title="Drag to a day to add manually">⠿</span>
+                        <strong>[${item.subject}]</strong><br>${item.topic}
+                        ${isCustom ? `<br><button class="btn-del-topic" onclick="removeCustomTopic('${item.id}', event)">✕ remove topic</button>` : ''}
+                    </td>
                     <td><input type="number" step="0.5" min="0" value="${lecVal}" onchange="updateOverride('${item.id}', 'lec', this.value)"></td>
                     <td><input type="number" min="0" value="${qsVal}" onchange="updateOverride('${item.id}', 'qs', this.value)"></td>
                     <td><input type="number" step="0.1" min="0" value="${mpqVal}" onchange="updateOverride('${item.id}', 'mpq', this.value)"></td>
                 `;
                 tbody.appendChild(tr);
             });
+
+            // keep subject suggestion list fresh for the upload form
+            const datalist = document.getElementById('subject-suggestions');
+            if (datalist) {
+                const uniqueSubjects = [...new Set(combinedList.map(x => x.subject))];
+                datalist.innerHTML = uniqueSubjects.map(s => `<option value="${s}"></option>`).join('');
+            }
         }
 
         function updateOverride(topicId, key, value) {
             if (!userDataState.topicOverrides[topicId]) userDataState.topicOverrides[topicId] = {};
             userDataState.topicOverrides[topicId][key] = parseFloat(value) || 0;
+            persistUserData();
+        }
+
+        // --- Upload / Add new syllabus topic ---
+        function addCustomTopic() {
+            const subjectEl = document.getElementById('new-topic-subject');
+            const nameEl = document.getElementById('new-topic-name');
+            const lecEl = document.getElementById('new-topic-lec');
+            const qsEl = document.getElementById('new-topic-qs');
+            const mpqEl = document.getElementById('new-topic-mpq');
+
+            const subject = subjectEl.value.trim();
+            const topic = nameEl.value.trim();
+            const lec = parseFloat(lecEl.value) || 0;
+            const qs = parseFloat(qsEl.value) || 0;
+            const mpq = parseFloat(mpqEl.value) || 1.5;
+
+            if (!subject || !topic) {
+                alert("Please provide both a Subject name and a Topic name before uploading.");
+                return;
+            }
+            if (lec <= 0 && qs <= 0) {
+                alert("Please provide at least Lecture Hours or a Qs Count so the engine has something to schedule.");
+                return;
+            }
+
+            const newId = 'custom_' + subject.toLowerCase().replace(/[^a-z0-9]/g, '') + '_' + Date.now();
+
+            if (!userDataState.customTopics) userDataState.customTopics = [];
+            userDataState.customTopics.push({
+                id: newId,
+                subject: subject,
+                topic: topic,
+                lec: lec,
+                qs: qs,
+                mpq: mpq,
+                isCustom: true
+            });
+
+            subjectEl.value = '';
+            nameEl.value = '';
+            lecEl.value = '';
+            qsEl.value = '';
+            mpqEl.value = '';
+
+            generateSyllabusConfigTable();
+            persistUserData();
+        }
+
+        function removeCustomTopic(topicId, evt) {
+            if (evt) evt.stopPropagation();
+            userDataState.customTopics = (userDataState.customTopics || []).filter(t => t.id !== topicId);
+            delete userDataState.topicOverrides[topicId];
+            generateSyllabusConfigTable();
             persistUserData();
         }
 
@@ -542,8 +692,10 @@
 
             let taskQueue = [];
             let subjectGroups = {};
+            const removedAutoTasks = userDataState.removedAutoTasks || {};
+            const combinedSyllabusForEngine = getCombinedSyllabus();
 
-            masterRawSyllabus.forEach(item => {
+            combinedSyllabusForEngine.forEach(item => {
                 const override = userDataState.topicOverrides[item.id] || {};
                 const lec = override.lec !== undefined ? override.lec : item.lec;
                 const qs = override.qs !== undefined ? override.qs : item.qs;
@@ -564,14 +716,17 @@
 
             for (const subject in subjectGroups) {
                 subjectGroups[subject].forEach(topic => {
-                    if (topic.lecHours > 0) {
+                    if (topic.lecHours > 0 && !removedAutoTasks[`lec_${topic.id}`]) {
                         taskQueue.push({ type: 'lec', id: topic.id, sub: subject, label: `Lecture: ${topic.topic}`, hours: topic.lecHours });
                     }
-                    if (topic.pracHours > 0) {
+                    if (topic.pracHours > 0 && !removedAutoTasks[`prac_${topic.id}`]) {
                         taskQueue.push({ type: 'prac', id: topic.id, sub: subject, label: `Practice Drill: ${topic.topic} (${topic.qsCount} Qs)`, hours: topic.pracHours });
                     }
                 });
-                taskQueue.push({ type: 'section_rev', id: `rev_${subject.toLowerCase().replace(/[^a-z]/g,'')}`, sub: subject, label: `Sectional Review + Strategy Revision [${subject}]`, hours: 4 });
+                const revUid = `section_rev_rev_${subject.toLowerCase().replace(/[^a-z]/g,'')}`;
+                if (!removedAutoTasks[revUid]) {
+                    taskQueue.push({ type: 'section_rev', id: `rev_${subject.toLowerCase().replace(/[^a-z]/g,'')}`, sub: subject, label: `Sectional Review + Strategy Revision [${subject}]`, hours: 4 });
+                }
             }
 
             let trackingDays = [];
@@ -624,17 +779,23 @@
                 }
 
                 if (overrideTasks.length > 0) {
+                    const filteredOverrideTasks = overrideTasks.filter(t => !removedAutoTasks[t.uid]);
+                    let overrideDayTasks = filteredOverrideTasks.map(t => ({
+                        uid: t.uid,
+                        label: t.label,
+                        hours: t.hrs,
+                        done: !!userDataState.checks[t.uid]
+                    }));
+                    const manualForOverrideDay = (userDataState.manualDayTasks && userDataState.manualDayTasks[totalCalendarDaysCount]) || [];
+                    manualForOverrideDay.forEach(mt => {
+                        overrideDayTasks.push({ uid: mt.uid, label: mt.label, hours: mt.hours, done: !!userDataState.checks[mt.uid], isManual: true });
+                    });
                     trackingDays.push({
                         dayNum: totalCalendarDaysCount,
                         studyDayNum: currentDayIdx,
                         dateStr: targetCalendarDate.toDateString(),
                         type: scheduleType,
-                        tasks: overrideTasks.map(t => ({
-                            uid: t.uid,
-                            label: t.label,
-                            hours: t.hrs,
-                            done: !!userDataState.checks[t.uid]
-                        }))
+                        tasks: overrideDayTasks
                     });
                     currentDayIdx++;
                     continue;
@@ -697,6 +858,20 @@
                     ];
                 }
 
+                activeDayAllocationLoad = activeDayAllocationLoad.filter(t => !removedAutoTasks[t.uid]);
+
+                // Inject any manually drag-and-dropped topics for this specific calendar day
+                const manualForThisDay = (userDataState.manualDayTasks && userDataState.manualDayTasks[totalCalendarDaysCount]) || [];
+                manualForThisDay.forEach(mt => {
+                    activeDayAllocationLoad.push({
+                        uid: mt.uid,
+                        label: mt.label,
+                        hours: mt.hours,
+                        done: !!userDataState.checks[mt.uid],
+                        isManual: true
+                    });
+                });
+
                 trackingDays.push({
                     dayNum: totalCalendarDaysCount,
                     studyDayNum: currentDayIdx,
@@ -727,6 +902,10 @@
             subjectTotalsMap["Biology"] = { total: 0, done: 0 };
             subjectTotalsMap["English Lang"] = { total: 0, done: 0 };
             subjectTotalsMap["General Awareness"] = { total: 0, done: 0 };
+            // Any newly uploaded custom-topic subjects get their own tracked row too
+            (userDataState.customTopics || []).forEach(ct => {
+                if (!subjectTotalsMap[ct.subject]) subjectTotalsMap[ct.subject] = { total: 0, done: 0 };
+            });
 
             const currentEstTodayStr = new Date().toDateString();
             let matchedTodayIndexId = null;
@@ -756,7 +935,8 @@
                     if (!task.done && day.type !== 'REST') dayIsWhollyCompleted = false;
 
                     const checkedStatusAttribute = task.done ? 'checked' : '';
-                    const localizedClassDone = task.done ? 'task-item done' : 'task-item';
+                    let localizedClassDone = task.done ? 'task-item done' : 'task-item';
+                    if (task.isManual) localizedClassDone += ' manual-task';
 
                     if (day.type === 'REST') {
                         generatedTaskHtmlString += `
@@ -766,10 +946,12 @@
                         `;
                     } else {
                         generatedTaskHtmlString += `
-                            <div class="${localizedClassDone}">
+                            <div class="${localizedClassDone}" draggable="true"
+                                ondragstart="handleTaskDragStart(event, ${day.dayNum}, '${task.uid}', ${!!task.isManual})">
                                 <input type="checkbox" class="task-checkbox" ${checkedStatusAttribute} 
                                     onclick="toggleTaskProcessing('${task.uid}', this.checked)">
                                 <span>[${task.hours.toFixed(1)}H] ${task.label}</span>
+                                <span class="task-drag-dot" title="Drag to reorder or drop on trash to remove">⠿</span>
                             </div>
                         `;
                     }
@@ -805,7 +987,7 @@
                         <span class="badge ${badgeThemeClass}">${day.type}</span>
                         <div class="ledger-date">${day.dateStr}</div>
                     </div>
-                    <div class="task-list">
+                    <div class="task-list" ondragover="handleDayDragOver(event)" ondragleave="handleDayDragLeave(event)" ondrop="handleDayDrop(event, ${day.dayNum})">
                         ${generatedTaskHtmlString}
                     </div>
                 `;
@@ -857,10 +1039,110 @@
                 if (segmentToken.indexOf('_cont_') !== -1) {
                     segmentToken = segmentToken.split('_cont_')[0];
                 }
-                let foundItem = masterRawSyllabus.find(x => x.id === segmentToken);
+                let foundItem = getCombinedSyllabus().find(x => x.id === segmentToken);
                 return foundItem ? foundItem.subject : null;
             }
             return null;
+        }
+
+        // ============ DRAG & DROP: Syllabus row -> Day card (ADD) ============
+        function handleSyllabusDragStart(ev, id, subject, topic, lec, qs, mpq) {
+            dragPayload = { source: 'syllabus', id, subject, topic, lec: parseFloat(lec) || 0, qs: parseFloat(qs) || 0, mpq: parseFloat(mpq) || 1.5 };
+            ev.dataTransfer.effectAllowed = 'copy';
+            try { ev.dataTransfer.setData('text/plain', id); } catch (e) {}
+        }
+
+        function handleDayDragOver(ev) {
+            if (!dragPayload) return;
+            ev.preventDefault();
+            ev.currentTarget.classList.add('dropzone-active');
+            ev.dataTransfer.dropEffect = dragPayload.source === 'syllabus' ? 'copy' : 'move';
+        }
+
+        function handleDayDragLeave(ev) {
+            ev.currentTarget.classList.remove('dropzone-active');
+        }
+
+        function handleDayDrop(ev, dayNum) {
+            ev.preventDefault();
+            ev.currentTarget.classList.remove('dropzone-active');
+            if (!dragPayload) return;
+
+            if (dragPayload.source === 'syllabus') {
+                const practiceHours = (dragPayload.qs * dragPayload.mpq) / 60;
+                const totalHours = dragPayload.lec + practiceHours;
+                if (totalHours <= 0) { dragPayload = null; return; }
+
+                if (!userDataState.manualDayTasks) userDataState.manualDayTasks = {};
+                if (!userDataState.manualDayTasks[dayNum]) userDataState.manualDayTasks[dayNum] = [];
+
+                const manualUid = `manual_${dragPayload.id}_${Date.now()}`;
+                userDataState.manualDayTasks[dayNum].push({
+                    uid: manualUid,
+                    label: `Manual Add: [${dragPayload.subject}] ${dragPayload.topic} (Lec ${dragPayload.lec}H${dragPayload.qs ? ' + ' + dragPayload.qs + ' Qs' : ''})`,
+                    hours: totalHours
+                });
+                persistUserData();
+            } else if (dragPayload.source === 'day') {
+                // Dropping a task from one day onto another day moves it (only for manually added tasks)
+                if (dragPayload.isManual && dragPayload.dayNum !== dayNum) {
+                    const fromList = (userDataState.manualDayTasks && userDataState.manualDayTasks[dragPayload.dayNum]) || [];
+                    const idx = fromList.findIndex(t => t.uid === dragPayload.uid);
+                    if (idx !== -1) {
+                        const [moved] = fromList.splice(idx, 1);
+                        if (!userDataState.manualDayTasks[dayNum]) userDataState.manualDayTasks[dayNum] = [];
+                        userDataState.manualDayTasks[dayNum].push(moved);
+                        persistUserData();
+                    }
+                }
+            }
+            dragPayload = null;
+        }
+
+        // ============ DRAG & DROP: Day task -> Trash zone (REMOVE) ============
+        function handleTaskDragStart(ev, dayNum, uid, isManual) {
+            dragPayload = { source: 'day', dayNum, uid, isManual };
+            ev.dataTransfer.effectAllowed = 'move';
+            try { ev.dataTransfer.setData('text/plain', uid); } catch (e) {}
+        }
+
+        function handleTrashDragOver(ev) {
+            if (!dragPayload || dragPayload.source !== 'day') return;
+            ev.preventDefault();
+            document.getElementById('trash-dropzone').classList.add('dropzone-hot');
+        }
+
+        function handleTrashDragLeave(ev) {
+            document.getElementById('trash-dropzone').classList.remove('dropzone-hot');
+        }
+
+        function handleTrashDrop(ev) {
+            ev.preventDefault();
+            document.getElementById('trash-dropzone').classList.remove('dropzone-hot');
+            if (!dragPayload || dragPayload.source !== 'day') { dragPayload = null; return; }
+
+            if (dragPayload.isManual) {
+                const list = (userDataState.manualDayTasks && userDataState.manualDayTasks[dragPayload.dayNum]) || [];
+                userDataState.manualDayTasks[dragPayload.dayNum] = list.filter(t => t.uid !== dragPayload.uid);
+            } else {
+                if (!userDataState.removedAutoTasks) userDataState.removedAutoTasks = {};
+                userDataState.removedAutoTasks[dragPayload.uid] = true;
+                delete userDataState.checks[dragPayload.uid];
+            }
+            persistUserData();
+            dragPayload = null;
+        }
+
+        // ============ GENERATE PLAN (explicit manual recalculation) ============
+        function generatePlanNow() {
+            userDataState.settings.hours = parseFloat(document.getElementById('cfg-hours').value) || 6;
+            userDataState.settings.daysPerWeek = parseInt(document.getElementById('cfg-days-week').value) || 6;
+            persistUserData();
+            showSystemNotice("✅ Plan regenerated from current syllabus, overrides, and manual day placements.");
+            setTimeout(() => {
+                const el = document.getElementById('system-notification');
+                if (el) el.style.display = 'none';
+            }, 3500);
         }
 
         function toggleTaskProcessing(taskUid, isChecked) {
