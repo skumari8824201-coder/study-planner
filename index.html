@@ -1,891 +1,896 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>SSC CGL — 90 Day Command Log</title>
-<style>
-:root{
-  --ink:#10151b; --ink-2:#171e27; --ink-3:#1e2731;
-  --paper:#f6f1e4; --paper-line:#e2d9c0; --paper-shadow:rgba(0,0,0,.25);
-  --amber:#e2a23b; --amber-dim:#8a6526;
-  --redpen:#b3452f;
-  --teal:#2f6f62;
-  --indigo:#4a5a8c;
-  --olive:#6e7b3d;
-  --rust:#c1652f;
-  --text-light:#ede7d9; --text-dim:#9aa3ad;
-  --text-dark:#1c1a15;
-  --font-display:'Arial Narrow',"Segoe UI",system-ui,sans-serif;
-  --font-body:"Segoe UI",system-ui,-apple-system,sans-serif;
-  --font-mono:"Consolas","SFMono-Regular",Menlo,monospace;
-}
-*{box-sizing:border-box;}
-body{margin:0;background:var(--ink);color:var(--text-light);font-family:var(--font-body);}
-::-webkit-scrollbar{width:10px;height:10px;}
-::-webkit-scrollbar-thumb{background:#2a3440;border-radius:6px;}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSC CGL 90-Day Command Center</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Oswald:wght@500;700&family=Reenie+Beanie&family=Special+Elite&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-chrome: #0B132B;
+            --surface-chrome: #1C2541;
+            --text-light: #F4F5F7;
+            --text-dim: #9A1F40;
+            --accent-amber: #FF9F1C;
+            --accent-red: #D90429;
+            --paper-bg: #FFFDF6;
+            --paper-line: #E1DBD0;
+            --paper-text: #2B2D42;
+            --paper-blue-line: #3A86C8;
+        }
 
-/* ---------- header / command bar ---------- */
-.cmdbar{
-  background:linear-gradient(180deg,#141a21,#10151b);
-  border-bottom:1px solid #2a3440;
-  padding:22px 28px 16px;
-  position:sticky; top:0; z-index:50;
-}
-.cmdbar-top{display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:16px;}
-.brand{display:flex; flex-direction:column;}
-.brand .eyebrow{
-  font-family:var(--font-mono); font-size:11px; letter-spacing:.28em; color:var(--amber);
-  text-transform:uppercase; margin-bottom:6px;
-}
-.brand h1{
-  font-family:var(--font-display); font-weight:800; font-stretch:condensed;
-  letter-spacing:.01em; font-size:32px; margin:0; color:var(--text-light);
-  text-transform:uppercase;
-}
-.stat-row{display:flex; gap:26px; flex-wrap:wrap;}
-.stat{text-align:right;}
-.stat .n{font-family:var(--font-mono); font-size:26px; font-weight:700; color:var(--amber); line-height:1;}
-.stat .l{font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--text-dim); margin-top:4px;}
-.progress-outer{margin-top:16px; background:#0b0f13; border:1px solid #2a3440; border-radius:4px; height:10px; overflow:hidden;}
-.progress-inner{height:100%; background:linear-gradient(90deg,var(--redpen),var(--amber)); transition:width .4s;}
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'JetBrains Mono', monospace; background-color: var(--bg-chrome); color: var(--text-light); min-height: 100vh; padding-bottom: 40px; }
+        
+        /* Typography Helpers */
+        h1, h2, h3, .cmd-head { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 1px; }
 
-.tabs{display:flex; gap:2px; margin-top:18px;}
-.tab{
-  font-family:var(--font-mono); font-size:12px; letter-spacing:.08em; text-transform:uppercase;
-  padding:10px 18px; background:#171e27; color:var(--text-dim); border:1px solid #2a3440; border-bottom:none;
-  cursor:pointer; border-radius:6px 6px 0 0;
-}
-.tab.active{background:var(--paper); color:var(--text-dark); font-weight:700;}
+        /* Gate Screen / Auth */
+        #gate-screen { position: fixed; inset: 0; background: var(--bg-chrome); display: flex; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+        .gate-card { background: var(--surface-chrome); border: 3px solid var(--accent-amber); padding: 40px; border-radius: 4px; max-width: 450px; width: 100%; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .gate-input { width: 100%; padding: 12px; background: #000; border: 1px solid #444; color: var(--accent-amber); font-family: inherit; font-size: 18px; text-align: center; margin: 20px 0; text-transform: lowercase; }
+        .gate-btn { background: var(--accent-amber); color: #000; border: none; padding: 12px 24px; font-weight: bold; font-family: 'Oswald', sans-serif; cursor: pointer; font-size: 18px; width: 100%; text-transform: uppercase; }
+        .gate-btn:hover { background: #fff; }
 
-.view{display:none; max-width:1080px; margin:0 auto; padding:26px 28px 80px;}
-.view.active{display:block;}
+        /* Main Dashboard Frame */
+        header { background: var(--surface-chrome); padding: 15px 30px; border-bottom: 2px solid var(--accent-amber); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .user-badge { background: #000; padding: 6px 12px; border: 1px dashed var(--accent-amber); font-size: 12px; }
+        .switch-uid { color: var(--accent-red); cursor: pointer; text-decoration: underline; margin-left: 10px; font-weight: bold; }
+        
+        .layout { display: grid; grid-template-columns: 1fr; gap: 25px; padding: 20px; max-width: 1600px; margin: 0 auto; }
+        @media(min-width: 1024px) { .layout { grid-template-columns: 450px 1fr; } }
 
-/* ---------- shared card ---------- */
-.card{background:var(--ink-2); border:1px solid #2a3440; border-radius:10px; padding:20px 22px; margin-bottom:18px;}
-.card h2{font-family:var(--font-display); font-stretch:condensed; text-transform:uppercase; letter-spacing:.03em; font-size:18px; margin:0 0 14px; color:var(--amber);}
-.card p.hint{color:var(--text-dim); font-size:13px; margin:-8px 0 16px; line-height:1.5;}
+        /* Notice banner for errors/warnings */
+        #system-notification { background: var(--accent-red); color: white; padding: 12px; font-size: 13px; display: none; margin-bottom: 15px; border-left: 5px solid #000; word-break: break-all; }
 
-/* ---------- dashboard ---------- */
-.settings-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin-bottom:16px;}
-.settings-grid label{display:block; font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-dim); margin-bottom:6px;}
-.settings-grid input, .settings-grid select{
-  width:100%; padding:9px 10px; background:var(--ink-3); border:1px solid #354150; border-radius:6px;
-  color:var(--text-light); font-family:var(--font-mono); font-size:13px;
-}
-.btn{
-  font-family:var(--font-mono); font-weight:700; letter-spacing:.05em; text-transform:uppercase; font-size:12px;
-  background:var(--amber); color:#20150a; border:none; padding:11px 20px; border-radius:6px; cursor:pointer;
-}
-.btn:hover{background:#eeb457;}
-.btn.ghost{background:transparent; color:var(--amber); border:1px solid var(--amber-dim);}
+        /* Dashboard Panel */
+        .panel { background: var(--surface-chrome); padding: 20px; border-radius: 4px; border: 1px solid #2A3454; height: max-content; }
+        .progress-bar-container { background: #000; height: 18px; border-radius: 9px; overflow: hidden; margin: 8px 0 20px 0; border: 1px solid #333; }
+        .progress-bar-fill { height: 100%; background: var(--accent-amber); width: 0%; transition: width 0.4s ease; }
+        .subject-progress-row { font-size: 12px; margin-bottom: 8px; }
+        .subject-mini-bar { background: #000; height: 6px; width: 100%; margin-top: 4px; }
+        .subject-mini-fill { height: 100%; background: #2A9D8F; width: 0%; }
 
-.subject-bars{display:flex; flex-direction:column; gap:12px;}
-.subject-bar-row{display:grid; grid-template-columns:170px 1fr 60px; align-items:center; gap:12px;}
-.subject-bar-row .name{font-size:13px; font-weight:600;}
-.bar-track{background:#0b0f13; border:1px solid #2a3440; border-radius:4px; height:14px; overflow:hidden;}
-.bar-fill{height:100%;}
-.subject-bar-row .pct{font-family:var(--font-mono); font-size:12px; color:var(--text-dim); text-align:right;}
+        /* Configuration Table Container */
+        .config-container { overflow-x: auto; margin-top: 15px; max-height: 400px; border: 1px solid #000; }
+        table.config-table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; background: #131A30; }
+        table.config-table th { background: #000; padding: 8px; color: var(--accent-amber); position: sticky; top: 0; z-index: 5; }
+        table.config-table td { padding: 6px 8px; border-bottom: 1px solid #232D4B; }
+        table.config-table input { width: 55px; background: #000; border: 1px solid #444; color: #fff; padding: 4px; text-align: center; font-family: inherit; font-size: 12px; border-radius: 2px; }
+        table.config-table input:focus { border-color: var(--accent-amber); outline: none; }
 
-/* ---------- syllabus editor ---------- */
-table.syl{width:100%; border-collapse:collapse; font-size:13px;}
-table.syl th{
-  text-align:left; font-family:var(--font-mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.08em;
-  color:var(--text-dim); padding:8px 6px; border-bottom:1px solid #2a3440;
-}
-table.syl td{padding:6px; border-bottom:1px solid #202a34; vertical-align:middle;}
-table.syl tr.subject-head td{
-  font-family:var(--font-display); text-transform:uppercase; letter-spacing:.04em; font-size:13px; font-weight:700;
-  padding-top:16px; padding-bottom:6px; border-bottom:none;
-}
-table.syl input{
-  width:64px; padding:5px 6px; background:var(--ink-3); border:1px solid #354150; border-radius:5px;
-  color:var(--text-light); font-family:var(--font-mono); font-size:12.5px; text-align:center;
-}
-.swatch{display:inline-block; width:9px; height:9px; border-radius:2px; margin-right:8px;}
+        /* Global Controls Block */
+        .global-settings { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px; font-size: 12px; }
+        .global-settings label { display: flex; flex-direction: column; gap: 4px; color: #A0AABF; }
+        .global-settings select, .global-settings input { padding: 8px; background: #000; border: 1px solid #444; color: #fff; font-family: inherit; border-radius: 2px; }
 
-/* ---------- day planner (ledger cards) ---------- */
-.planner-toolbar{display:flex; gap:10px; align-items:center; margin-bottom:16px; flex-wrap:wrap;}
-.daycard{
-  background:var(--paper); color:var(--text-dark); border-radius:8px; margin-bottom:14px;
-  box-shadow:0 3px 0 var(--paper-shadow); position:relative; overflow:hidden;
-}
-.daycard.rest{opacity:.55;}
-.daycard .rule{position:absolute; left:0; right:0; height:1px; background:var(--paper-line);}
-.daycard-head{
-  display:flex; justify-content:space-between; align-items:center; padding:12px 18px;
-  border-bottom:1px solid var(--paper-line);
-}
-.daycard-head .daynum{font-family:var(--font-mono); font-size:11px; color:#6b6248; letter-spacing:.08em;}
-.daycard-head .datestr{font-family:var(--font-display); font-weight:800; text-transform:uppercase; font-size:15px;}
-.badge{
-  font-family:var(--font-mono); font-size:10px; letter-spacing:.06em; text-transform:uppercase;
-  padding:3px 9px; border-radius:20px; color:#fff;
-}
-.daycard-body{padding:6px 18px 14px;}
-.task-row{display:flex; align-items:center; gap:10px; padding:7px 0; border-bottom:1px dashed var(--paper-line);}
-.task-row:last-child{border-bottom:none;}
-.task-row input[type=checkbox]{width:17px; height:17px; accent-color:var(--redpen); cursor:pointer; flex:0 0 auto;}
-.task-row .tlabel{font-size:13.5px; flex:1;}
-.task-row.done .tlabel{text-decoration:line-through; color:#8b8266;}
-.task-row .tmin{font-family:var(--font-mono); font-size:11px; color:#7a715a;}
-.stamp{
-  font-family:var(--font-mono); font-size:11px; font-weight:700; color:var(--teal); border:1.5px solid var(--teal);
-  padding:2px 8px; border-radius:4px; transform:rotate(-6deg); letter-spacing:.05em;
-}
-.daycard-empty{padding:16px 18px; font-family:var(--font-mono); font-size:12px; color:#8b8266;}
+        /* Day Planner Ledger Layout */
+        .planner-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 10px; }
+        .btn-action { background: #2A3454; color: #fff; border: 1px solid #444; padding: 8px 16px; font-size: 12px; cursor: pointer; text-transform: uppercase; }
+        .btn-action:hover { background: var(--accent-amber); color: #000; }
+        .day-grid { display: flex; flex-direction: column; gap: 25px; }
 
-.footer-note{color:var(--text-dim); font-size:12px; text-align:center; margin-top:30px;}
+        /* Notebook Ledger Page Aesthetic */
+        .ledger-page { background: var(--paper-bg); color: var(--paper-text); padding: 30px 40px; border-radius: 2px; box-shadow: 4px 4px 15px rgba(0,0,0,0.3); border-left: 25px solid #E67E22; position: relative; background-image: linear-gradient(var(--paper-line) 1px, transparent 1px); background-size: 100% 24px; line-height: 24px; padding-top: 48px; min-height: 180px; }
+        .ledger-page::before { content: ''; position: absolute; top: 0; left: 15px; width: 1px; height: 100%; background: rgba(217, 4, 41, 0.2); }
+        
+        .ledger-header { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 2px solid var(--paper-blue-line); padding-bottom: 4px; margin-bottom: 12px; font-family: 'Oswald', sans-serif; text-transform: uppercase; }
+        .ledger-date { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: bold; color: #555; }
+        .badge { padding: 2px 8px; font-size: 11px; font-weight: bold; color: #fff; text-transform: uppercase; border-radius: 2px; font-family: 'JetBrains Mono', monospace; }
+        .badge-study { background: #3A86C8; }
+        .badge-rev { background: #E67E22; }
+        .badge-mock { background: #8E44AD; }
+        .badge-mara { background: #27AE60; }
+        .badge-rest { background: #7F8C8D; color: white !important; }
 
-/* ---------- login / resume gate ---------- */
-#gate{
-  position:fixed; inset:0; background:var(--ink); display:flex; align-items:center; justify-content:center;
-  z-index:100; padding:20px;
-}
-#gate .gatecard{
-  background:var(--paper); color:var(--text-dark); border-radius:10px; padding:34px 30px; width:100%; max-width:380px;
-  box-shadow:0 4px 0 var(--paper-shadow);
-}
-#gate .eyebrow{font-family:var(--font-mono); font-size:11px; letter-spacing:.24em; color:var(--redpen); text-transform:uppercase;}
-#gate h2{font-family:var(--font-display); text-transform:uppercase; font-size:22px; margin:8px 0 4px;}
-#gate p{font-size:13px; color:#6b6248; line-height:1.5; margin:0 0 18px;}
-#gate input{
-  width:100%; padding:11px 12px; border:1px solid var(--paper-line); border-radius:6px; font-family:var(--font-mono);
-  font-size:14px; margin-bottom:12px; background:#fff;
-}
-#gate .gateBtn{width:100%;}
-#gate .gateMsg{font-size:12px; margin-top:12px; min-height:16px;}
-#gate .gateMsg.err{color:var(--redpen);}
-#gate .gateMsg.ok{color:var(--teal);}
-.userchip{
-  font-family:var(--font-mono); font-size:11px; color:var(--text-dim); cursor:pointer; text-decoration:underline;
-  text-underline-offset:3px; background:none; border:none;
-}
-@media(max-width:640px){
-  .cmdbar{padding:16px;} .view{padding:18px 14px 60px;}
-  .subject-bar-row{grid-template-columns:110px 1fr 44px;}
-}
-</style>
+        .task-list { display: flex; flex-direction: column; }
+        .task-item { display: flex; align-items: center; min-height: 24px; border-bottom: 1px dashed var(--paper-line); font-size: 13px; position: relative; padding-left: 30px; }
+        .task-item.done { text-decoration: line-through; color: #888; }
+        
+        /* Red Ink Checkbox Accent */
+        .task-checkbox { position: absolute; left: 2px; top: 4px; width: 16px; height: 16px; appearance: none; border: 1px solid #777; cursor: pointer; border-radius: 2px; background: white; }
+        .task-checkbox:checked { border-color: var(--accent-red); background: white; }
+        .task-checkbox:checked::after { content: '✓'; position: absolute; left: 2px; top: -4px; color: var(--accent-red); font-size: 16px; font-weight: bold; font-family: sans-serif; }
+
+        /* Completed Stamp Design */
+        .completed-stamp { position: absolute; right: 40px; top: 20px; font-family: 'Special Elite', cursive; color: rgba(217, 4, 41, 0.75); border: 3px double rgba(217, 4, 41, 0.75); transform: rotate(-12deg); padding: 5px 15px; font-size: 22px; font-weight: bold; text-transform: uppercase; border-radius: 4px; pointer-events: none; display: none; z-index: 10; }
+        .ledger-page.all-done .completed-stamp { display: block; }
+        .ledger-page.all-done { background-color: #FDFBF0; }
+
+        /* Cross Check Gaps Warning Component */
+        .gap-box { background: #2d1822; border-left: 4px solid var(--accent-red); padding: 12px; font-size: 11px; line-height: 1.5; margin-top: 15px; border-radius: 4px; }
+        .gap-title { font-weight: bold; color: #ff6b6b; margin-bottom: 5px; text-transform: uppercase; }
+        .gap-box ul { padding-left: 15px; margin-top: 4px; color: #ddd; }
+    </style>
 </head>
 <body>
 
-<div id="gate">
-  <div class="gatecard">
-    <span class="eyebrow">SSC CGL · Study Log</span>
-    <h2 id="gateTitle">Start Your Plan</h2>
-    <p id="gateSub">Pick a name or ID — it's how your progress finds you again, on any device. First time here starts the clock on today; coming back just resumes it.</p>
-    <input type="text" id="gateInput" placeholder="e.g. rahul-cgl26" autocomplete="off">
-    <button class="btn gateBtn" id="gateBtn">Start / Resume</button>
-    <div class="gateMsg" id="gateMsg"></div>
-  </div>
-</div>
-
-<div id="appRoot" style="display:none;">
-
-<div class="cmdbar">
-  <div class="cmdbar-top">
-    <div class="brand">
-      <span class="eyebrow">SSC CGL · Study Log</span>
-      <h1>90-Day Command Planner</h1>
-      <button class="userchip" id="btnSwitchUser" style="margin-top:6px; text-align:left; padding:0;">Signed in as <span id="whoami"></span> · switch</button>
+    <div id="gate-screen">
+        <div class="gate-card">
+            <h1 style="color: var(--accent-amber); font-size: 28px;">SSC CGL COMMAND CENTER</h1>
+            <p style="font-size: 12px; color: #A0AABF; margin-top: 5px;">3-Month Structured Blueprint Automation</p>
+            <input type="text" id="uid-input" class="gate-input" placeholder="enter sync id (e.g., king-cgl26)" autocomplete="off">
+            <button class="gate-btn" onclick="initSession()">Establish Dashboard Session</button>
+        </div>
     </div>
-    <div class="stat-row">
-      <div class="stat"><div class="n" id="statDayOf">D0/90</div><div class="l">Day</div></div>
-      <div class="stat"><div class="n" id="statLeft">90</div><div class="l">Days Left</div></div>
-      <div class="stat"><div class="n" id="statPct">0%</div><div class="l">Syllabus Done</div></div>
+
+    <header>
+        <div>
+            <h1 style="font-size: 24px; color: var(--accent-amber);">CGL TARGET BLUEPRINT</h1>
+            <p style="font-size: 11px; color: #A0AABF;">Daily Production Schedule Engine & Task Matrix</p>
+        </div>
+        <div class="user-badge">
+            SYNC ID: <span id="active-uid-display" style="color:var(--accent-amber);">none</span>
+            <span class="switch-uid" onclick="logoutSession()">[DISCONNECT]</span>
+        </div>
+    </header>
+
+    <div class="layout">
+        <div class="sidebar">
+            <div id="system-notification"></div>
+
+            <div class="panel">
+                <h2 class="cmd-head" style="color: var(--accent-amber); font-size: 18px; margin-bottom: 12px;">Operational Status</h2>
+                <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                    <span>Timeline Scope:</span>
+                    <span id="countdown-text" style="font-weight: bold;">-- / 90 Days</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div id="global-progress-fill" class="progress-bar-fill"></div>
+                </div>
+
+                <h3 class="cmd-head" style="font-size: 13px; color: #A0AABF; margin-bottom: 8px;">Subject Yield Breakdown</h3>
+                <div id="subject-progress-stack"></div>
+                
+                <div class="gap-box">
+                    <div class="gap-title">⚠️ Cross-Check Notification vs Input Notebook</div>
+                    <div>Based on the official 2024 pattern, the following discrepancies were identified and require structural awareness:</div>
+                    <ul>
+                        <li><strong>Advanced Statistics Module:</strong> Found inside your Advanced Maths notebook listing. Note: This is exclusively scaled for Paper-II (JSO role). It will not be tested in Tier-I or regular Tier-II Paper-I tracks.</li>
+                        <li><strong>Missing Subject Scopes:</strong> Your input list omitted specific tracking metadata for <strong>English Language & Comprehension</strong> and <strong>General Awareness (History/Polity/Geography/Current GK)</strong>.</li>
+                        <li><strong>Auto-Mitigation:</strong> English and GA rows have been injected into the control matrix below with placeholder scopes. You can adjust their volume directly to calculate schedule spaces.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <br>
+
+            <div class="panel">
+                <h2 class="cmd-head" style="color: var(--accent-amber); font-size: 18px; margin-bottom: 12px;">Dynamic Matrix Parameters</h2>
+                <div class="global-settings">
+                    <label>
+                        Available Daily Hours
+                        <input type="number" id="cfg-hours" value="6" min="1" max="16" onchange="triggerRecalc()">
+                    </label>
+                    <label>
+                        Study Days / Week
+                        <select id="cfg-days-week" onchange="triggerRecalc()">
+                            <option value="5">5 Days</option>
+                            <option value="6" selected>6 Days</option>
+                            <option value="7">7 Days</option>
+                        </select>
+                    </label>
+                </div>
+
+                <h3 class="cmd-head" style="font-size: 14px; margin-bottom: 5px;">Syllabus Variable Blueprint</h3>
+                <div class="config-container">
+                    <table class="config-table">
+                        <thead>
+                            <tr>
+                                <th>Subject/Topic</th>
+                                <th>Lec (H)</th>
+                                <th>Qs Count</th>
+                                <th>Min/Q</th>
+                            </tr>
+                        </thead>
+                        <tbody id="config-table-body"></tbody>
+                    </table>
+                </div>
+                <p style="font-size: 10px; color:#A0AABF; margin-top:6px; line-height: 1.3;">
+                    * Updating any input live-shifts future task lengths, automatically generating dynamic multi-day remainder splices without losing checked data.
+                </p>
+            </div>
+        </div>
+
+        <div class="workspace">
+            <div class="planner-controls">
+                <h2 class="cmd-head" style="font-size: 22px; border-bottom: 2px solid var(--accent-amber);">Day-by-Day Deployment</h2>
+                <div>
+                    <button class="btn-action" onclick="jumpToToday()">Jump To Current Day</button>
+                    <button class="btn-action" id="toggle-filter-btn" onclick="toggleRemainingFilter()">Show Outstanding Only</button>
+                </div>
+            </div>
+
+            <div id="day-grid" class="day-grid"></div>
+        </div>
     </div>
-  </div>
-  <div class="progress-outer"><div class="progress-inner" id="topProgress" style="width:0%"></div></div>
-  <div class="tabs">
-    <div class="tab active" data-tab="dash">Dashboard</div>
-    <div class="tab" data-tab="syl">Edit Syllabus</div>
-    <div class="tab" data-tab="plan">Day Planner</div>
-  </div>
-</div>
 
-<!-- DASHBOARD -->
-<div class="view active" id="view-dash">
-  <div class="card">
-    <h2>Plan Settings</h2>
-    <p class="hint">These drive the whole schedule. Change anything, then hit Regenerate — your checked-off tasks stay put wherever the topic still appears.</p>
-    <div class="settings-grid">
-      <div><label>Start Date</label><input type="date" id="setStart"></div>
-      <!-- auto-set to the day you first sign in; change it here only if you want to shift the whole plan -->
-      <div><label>Study Days / Week</label>
-        <select id="setDaysPerWeek">
-          <option value="7">7 — no rest day</option>
-          <option value="6" selected>6 — one rest/buffer day</option>
-          <option value="5">5 — two rest/buffer days</option>
-        </select>
-      </div>
-      <div><label>Hours / Study Day</label><input type="number" id="setHours" value="6" min="1" max="14" step="0.5"></div>
-      <div><label>Total Plan Length (days)</label><input type="number" id="setTotalDays" value="90" min="30" max="180"></div>
-    </div>
-    <button class="btn" id="btnGenerate">Regenerate Plan</button>
-  </div>
+    <script>
+        // Structural Fallback Network Verification Loops
+        window.addEventListener('error', function(e) {
+            if (e.target && (e.target.src || e.target.href)) {
+                if (e.target.src.indexOf('gstatic.com') !== -1) {
+                    showSystemNotice("Primary Firebase CDN failed to execute. Initiating alternate resource loading arrays...");
+                    loadFallbackFirebase();
+                }
+            }
+        }, true);
 
-  <div class="card">
-    <h2>Subject Progress</h2>
-    <div class="subject-bars" id="subjectBars"></div>
-  </div>
-
-  <div class="card">
-    <h2>How the day is structured</h2>
-    <p class="hint" style="margin-bottom:0;">
-      Every study day = watch the lecture(s) for a topic, then immediately drill practice questions on that same topic — exactly how you asked it. Every 7th study day becomes a <b>Weekly Revision + Mini Test</b> day. Every 4th of those (~monthly) becomes a <b>Full-Length Mock + Analysis</b> day. Once the syllabus queue empties, remaining days convert automatically into a <b>Final Revision & Mock Marathon</b> cycling through every subject until day {{TOTAL}}.
-    </p>
-  </div>
-</div>
-
-<!-- SYLLABUS EDITOR -->
-<div class="view" id="view-syl">
-  <div class="card">
-    <h2>Edit Syllabus &amp; Time Estimates</h2>
-    <p class="hint">I transcribed these numbers from your notebook photos — some digits were genuinely hard to read (marked with a lighter background). Fix any lecture-hours or question-count that's wrong; the whole planner recalculates from this table.</p>
-    <table class="syl">
-      <thead><tr><th style="width:34px">#</th><th>Topic</th><th>Lecture Hrs</th><th>Practice Qs</th><th>Min / Q</th><th>Total Time</th></tr></thead>
-      <tbody id="sylBody"></tbody>
-    </table>
-    <div style="margin-top:16px;"><button class="btn" id="btnSaveSyl">Save &amp; Regenerate</button> <button class="btn ghost" id="btnResetSyl">Reset to my defaults</button></div>
-  </div>
-</div>
-
-<!-- DAY PLANNER -->
-<div class="view" id="view-plan">
-  <div class="planner-toolbar">
-    <button class="btn ghost" id="btnJumpToday">Jump to Today</button>
-    <select id="filterWeek" style="padding:9px 10px;background:var(--ink-3);border:1px solid #354150;border-radius:6px;color:var(--text-light);font-family:var(--font-mono);font-size:12px;">
-      <option value="all">Show: All Days</option>
-      <option value="remaining">Show: Remaining Only</option>
-    </select>
-  </div>
-  <div id="dayList"></div>
-</div>
-
-<div class="footer-note">Built from your notebook · edits &amp; checkmarks sync automatically to your account.</div>
-
-</div><!-- /appRoot -->
-
-<script>
-/* Resilient Firebase loader: try gstatic, fall back to cdnjs, never let a
-   network/ad-blocker failure crash the whole page. */
-window.__fbReady = false;
-window.__fbLoadFailed = false;
-function __loadScript(src){
-  return new Promise((resolve,reject)=>{
-    const s = document.createElement('script');
-    s.src = src; s.onload = ()=>resolve(); s.onerror = ()=>reject(new Error('failed '+src));
-    document.head.appendChild(s);
-  });
-}
-(async function loadFirebase(){
-  const primary  = ['https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js','https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js'];
-  const fallback = ['https://cdnjs.cloudflare.com/ajax/libs/firebase/10.12.2/firebase-app-compat.min.js','https://cdnjs.cloudflare.com/ajax/libs/firebase/10.12.2/firebase-firestore-compat.min.js'];
-  try{
-    await __loadScript(primary[0]); await __loadScript(primary[1]);
-    window.__fbReady = true;
-  }catch(e1){
-    console.warn('Primary Firebase CDN failed, trying fallback…', e1);
-    try{
-      await __loadScript(fallback[0]); await __loadScript(fallback[1]);
-      window.__fbReady = true;
-    }catch(e2){
-      console.error('Both Firebase CDNs failed to load', e2);
-      window.__fbLoadFailed = true;
-    }
-  }
-  window.dispatchEvent(new Event('fb-scripts-settled'));
-})();
-</script>
-<script>
-/* ======================= SUBJECT DEFINITIONS ======================= */
-const SUBJECTS = [
-  {id:'ntm', name:'Non-Technical Maths', color:'#2f6f62'},
-  {id:'adm', name:'Advanced Maths', color:'#4a5a8c'},
-  {id:'rsn', name:'Reasoning', color:'#b3452f'},
-  {id:'chm', name:'Chemistry', color:'#3e7c59'},
-  {id:'phy', name:'Physics', color:'#7a6bb0'},
-  {id:'bio', name:'Biology', color:'#6e7b3d'},
-];
-const subjColor = id => (SUBJECTS.find(s=>s.id===id)||{}).color || '#888';
-const subjName  = id => (SUBJECTS.find(s=>s.id===id)||{}).name  || id;
-
-/* ======================= DEFAULT TOPIC LIST =======================
-   lecHours = hours of video lecture (you said each lecture ~2hrs)
-   q = practice questions to drill right after the lecture
-   fuzzy:true -> a number I genuinely wasn't sure about reading */
-const DEFAULT_TOPICS = [
- // Non-Technical Maths
- {s:'ntm', n:'HCF & LCM', lh:2, q:10},
- {s:'ntm', n:'Percentage', lh:2, q:19},
- {s:'ntm', n:'Profit & Loss', lh:2, q:14},
- {s:'ntm', n:'Discount', lh:2, q:9},
- {s:'ntm', n:'Simple Interest', lh:2, q:18},
- {s:'ntm', n:'Compound Interest', lh:2, q:18},
- {s:'ntm', n:'Time & Work', lh:2, q:14},
- {s:'ntm', n:'Wages', lh:1, q:2},
- {s:'ntm', n:'Pipe & Cistern', lh:2, q:5},
- {s:'ntm', n:'Time, Speed & Distance', lh:2, q:15},
- {s:'ntm', n:'Trains', lh:2, q:6},
- {s:'ntm', n:'Races', lh:1, q:3, fuzzy:true},
- {s:'ntm', n:'Circular Motion', lh:1, q:1, fuzzy:true},
- {s:'ntm', n:'Boats & Streams', lh:2, q:6},
- {s:'ntm', n:'Ratio & Proportion', lh:2, q:11},
- {s:'ntm', n:'Proportional Parts', lh:1, q:2},
- {s:'ntm', n:'Ages', lh:1, q:2},
- {s:'ntm', n:'Partnership', lh:2, q:7},
- // Advanced Maths
- {s:'adm', n:'Mixture & Alligation', lh:2, q:7},
- {s:'adm', n:'Navigation', lh:2, q:6, fuzzy:true},
- {s:'adm', n:'Average', lh:2, q:16},
- {s:'adm', n:'Simplification', lh:2, q:13},
- {s:'adm', n:'Surds & Indices', lh:2, q:28},
- {s:'adm', n:'Number System', lh:2, q:4},
- {s:'adm', n:'AP & GP', lh:2, q:4},
- {s:'adm', n:'Algebra', lh:2, q:20},
- {s:'adm', n:'Quadratic Equation', lh:2, q:2},
- {s:'adm', n:'Trigonometry', lh:2, q:24},
- {s:'adm', n:'Mensuration', lh:2, q:20},
- {s:'adm', n:'Height & Distance', lh:2, q:6},
- {s:'adm', n:'Geometry', lh:3, q:50, fuzzy:true},
- {s:'adm', n:'Coordinate Geometry', lh:2, q:21, fuzzy:true},
- {s:'adm', n:'Probability', lh:2, q:9, fuzzy:true},
- {s:'adm', n:'Statistics', lh:2, q:5},
- // Reasoning
- {s:'rsn', n:'Syllogism', lh:2, q:15},
- {s:'rsn', n:'Analogy', lh:2, q:15},
- {s:'rsn', n:'Letter Series', lh:2, q:15},
- {s:'rsn', n:'Figure Series', lh:2, q:15},
- {s:'rsn', n:'Coding-Decoding', lh:2, q:15},
- {s:'rsn', n:'Blood Relation', lh:2, q:15},
- {s:'rsn', n:'Sitting Arrangement', lh:2, q:15},
- {s:'rsn', n:'Number Series', lh:2, q:15},
- {s:'rsn', n:'Alphabet Series', lh:2, q:15},
- {s:'rsn', n:'Dot Situation', lh:1, q:10},
- {s:'rsn', n:'Missing Number', lh:1, q:15},
- {s:'rsn', n:'Statement & Argument', lh:2, q:15},
- {s:'rsn', n:'Cause & Effect', lh:1, q:15},
- {s:'rsn', n:'Statement & Assumption', lh:2, q:15},
- {s:'rsn', n:'Statement & Conclusion', lh:2, q:15},
- {s:'rsn', n:'Course of Action', lh:1, q:15},
- {s:'rsn', n:'Data Sufficiency', lh:2, q:15},
- {s:'rsn', n:'Coded Inequality', lh:2, q:15},
- {s:'rsn', n:'Decision Making', lh:1, q:15},
- {s:'rsn', n:'Puzzle', lh:2, q:20},
- {s:'rsn', n:'Input-Output', lh:2, q:15},
- // Chemistry
- {s:'chm', n:'Periodic Table', lh:2, q:15},
- {s:'chm', n:'Metals & Non-metals', lh:2, q:21},
- {s:'chm', n:'Atomic Structure', lh:2, q:5},
- {s:'chm', n:'Water', lh:1, q:2},
- {s:'chm', n:'Carbon & its Compounds', lh:2, q:4},
- {s:'chm', n:'Acid, Base & Salt', lh:2, q:6},
- {s:'chm', n:'Soap & Detergent', lh:1, q:1},
- {s:'chm', n:'Matter', lh:1, q:4},
- {s:'chm', n:'Radioactivity', lh:1, q:2},
- {s:'chm', n:'Physical Change', lh:1, q:1},
- {s:'chm', n:'Polymers', lh:1, q:1},
- {s:'chm', n:'Chemical Reactions', lh:2, q:5},
- // Physics
- {s:'phy', n:'Light', lh:2, q:8},
- {s:'phy', n:'Mirror', lh:1, q:2},
- {s:'phy', n:'Lens', lh:1, q:3},
- {s:'phy', n:'Primary Colours of Light', lh:1, q:1},
- {s:'phy', n:'Waves', lh:1, q:4, fuzzy:true},
- {s:'phy', n:'Sound', lh:2, q:4},
- {s:'phy', n:'Force & Laws of Motion', lh:2, q:9},
- {s:'phy', n:'Gravitation & Planetary Motion', lh:2, q:3},
- {s:'phy', n:'Projectile Motion', lh:1, q:1, fuzzy:true},
- {s:'phy', n:'Satellite', lh:1, q:2},
- {s:'phy', n:'Work & Power', lh:1, q:3},
- {s:'phy', n:'Heat & Temperature', lh:2, q:4},
- {s:'phy', n:'Electricity', lh:2, q:20, fuzzy:true},
- // Biology
- {s:'bio', n:'Biology — Full Syllabus', lh:10, q:112},
-];
-
-/* ======================= STATE ======================= */
-let TOPICS = [];          // active topic list (with overrides applied), each gets stable id
-let SETTINGS = {start:null, daysPerWeek:6, hours:6, totalDays:90};
-let CHECKS = {};           // taskId -> true
-let SCHEDULE = [];         // generated day objects
-
-function todayISO(){ const d=new Date(); return d.toISOString().slice(0,10); }
-
-function makeTopicId(t,i){ return 's_'+t.s+'_'+i; }
-
-function loadDefaultsIntoTopics(){
-  TOPICS = DEFAULT_TOPICS.map((t,i)=>({
-    id: makeTopicId(t,i), s:t.s, n:t.n, lh:t.lh, q:t.q, mpq:2.5, fuzzy:!!t.fuzzy
-  }));
-}
-
-/* ======================= FIREBASE ======================= */
-const firebaseConfig = {
-  apiKey: "AIzaSyD3J1u9V90DDNEE0VciSMYvTExEvcGbOPI",
-  authDomain: "my-study-plan-2026.firebaseapp.com",
-  projectId: "my-study-plan-2026",
-  storageBucket: "my-study-plan-2026.firebasestorage.app",
-  messagingSenderId: "218072970563",
-  appId: "1:218072970563:web:a308e83e7697a766956bf6",
-  measurementId: "G-YXJBWXJ852"
-};
-let db = null;
-let firebaseReady = false;
-function initFirebase(){
-  try{
-    firebase.initializeApp(firebaseConfig);
-    db = firebase.firestore();
-    // Some corporate networks, VPNs, and privacy extensions break Firestore's
-    // default streaming connection, which surfaces as "client is offline"
-    // even when the internet is fine. This makes it fall back to long-polling.
-    db.settings({experimentalAutoDetectLongPolling:true, merge:true});
-    firebaseReady = true;
-  }catch(e){
-    console.error('Firebase failed to initialize', e);
-    firebaseReady = false;
-  }
-}
-
-let currentUserId = null;
-const LAST_USER_KEY = 'ssc_planner_last_user';
-
-function sanitizeUserId(raw){
-  return (raw||'').trim().toLowerCase().replace(/[^a-z0-9_-]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60);
-}
-function userDoc(userId){ return db.collection('plans').doc(userId); }
-
-/* ======================= STORAGE (Firestore) ======================= */
-async function loadAll(){
-  loadDefaultsIntoTopics();
-  let data = null;
-  const snap = await userDoc(currentUserId).get();
-  if(snap.exists) data = snap.data();
-
-  if(data){
-    if(data.overrides){
-      TOPICS.forEach(t=>{
-        const o = data.overrides[t.id];
-        if(o){ t.lh = o.lh; t.q = o.q; t.mpq = o.mpq; }
-      });
-    }
-    SETTINGS = data.settings || {start:todayISO(), daysPerWeek:6, hours:6, totalDays:90};
-    CHECKS = data.checks || {};
-  } else {
-    // brand new user: lock the plan to start today, right now
-    SETTINGS = {start:todayISO(), daysPerWeek:6, hours:6, totalDays:90};
-    CHECKS = {};
-    await saveState(); // create the doc immediately so it exists next time
-  }
-}
-
-async function saveState(){
-  const overrides = {};
-  TOPICS.forEach(t=>{ overrides[t.id] = {lh:t.lh, q:t.q, mpq:t.mpq}; });
-  try{
-    await userDoc(currentUserId).set({
-      settings: SETTINGS,
-      overrides: overrides,
-      checks: CHECKS,
-      updatedAt: Date.now()
-    }, {merge:false});
-  }catch(e){
-    console.error('Firestore save failed', e);
-  }
-}
-async function saveTopicOverrides(){ await saveState(); }
-async function saveSettings(){ await saveState(); }
-async function saveChecks(){ await saveState(); }
-
-/* ======================= SCHEDULE GENERATION ======================= */
-function buildQueue(){
-  const q = [];
-  let lastSubj = null;
-  TOPICS.forEach(t=>{
-    if(lastSubj && lastSubj!==t.s){
-      // close out previous subject with a sectional test + revision
-      q.push({type:'sectional', subj:lastSubj, label:'Sectional Test: '+subjName(lastSubj), minutes:90, key:'sec_'+lastSubj});
-      q.push({type:'revision', subj:lastSubj, label:'Revise weak areas: '+subjName(lastSubj), minutes:60, key:'secrev_'+lastSubj});
-    }
-    q.push({type:'lecture', subj:t.s, topicId:t.id, label:'Lecture: '+t.n, minutes: t.lh*60, key:t.id+'_lec'});
-    q.push({type:'practice', subj:t.s, topicId:t.id, label:'Practice: '+t.n+' ('+t.q+' Qs)', minutes: Math.round(t.q*t.mpq), key:t.id+'_prac'});
-    lastSubj = t.s;
-  });
-  if(lastSubj){
-    q.push({type:'sectional', subj:lastSubj, label:'Sectional Test: '+subjName(lastSubj), minutes:90, key:'sec_'+lastSubj});
-    q.push({type:'revision', subj:lastSubj, label:'Revise weak areas: '+subjName(lastSubj), minutes:60, key:'secrev_'+lastSubj});
-  }
-  return q;
-}
-
-function addDays(dateStr, n){
-  const d = new Date(dateStr+'T00:00:00');
-  d.setDate(d.getDate()+n);
-  return d;
-}
-function fmtDate(d){
-  return d.toLocaleDateString('en-IN',{weekday:'short', day:'2-digit', month:'short'});
-}
-
-function isRestDay(dayIndex, daysPerWeek){
-  // dayIndex: 0-based overall calendar day. Use weekday pattern within a 7-day cycle.
-  const posInWeek = dayIndex % 7; // 0..6
-  if(daysPerWeek>=7) return false;
-  if(daysPerWeek===6) return posInWeek===6; // one rest day (last of week)
-  if(daysPerWeek===5) return posInWeek===5 || posInWeek===6; // two rest days
-  return false;
-}
-
-function generateSchedule(){
-  const queue = buildQueue();
-  const start = SETTINGS.start || todayISO();
-  const totalDays = SETTINGS.totalDays || 90;
-  const capacityMin = Math.round((SETTINGS.hours||6)*60);
-  const days = [];
-  let studyDayCounter = 0;
-  let qi = 0; // index into queue
-  let carry = null; // {task, remainingMinutes, part}
-
-  for(let i=0;i<totalDays;i++){
-    const date = addDays(start, i);
-    const dateISO = date.toISOString().slice(0,10);
-    if(isRestDay(i, SETTINGS.daysPerWeek)){
-      days.push({dayNum:i+1, date:dateISO, type:'rest', tasks:[]});
-      continue;
-    }
-    studyDayCounter++;
-    let dayType = 'study';
-    let tasks = [];
-
-    const isMonthly = (studyDayCounter % 28 === 0);
-    const isWeekly  = (!isMonthly) && (studyDayCounter % 7 === 0);
-
-    if(isMonthly){
-      dayType = 'monthly';
-      tasks.push({label:'Full-Length Mock Test (100 Qs, full syllabus mix)', minutes:180, key:'monthly_mock_'+i, doneKey:'monthly_mock_'+i});
-      tasks.push({label:'Score Analysis & Error Log', minutes:180, key:'monthly_analysis_'+i, doneKey:'monthly_analysis_'+i});
-    } else if(isWeekly){
-      dayType = 'weekly';
-      tasks.push({label:"Revise this week's topics (flip through notes + redo wrong Qs)", minutes: Math.round(capacityMin*0.6), key:'weekly_rev_'+i, doneKey:'weekly_rev_'+i});
-      tasks.push({label:'Mini Mock Test (mixed, ~50 Qs)', minutes: Math.round(capacityMin*0.4), key:'weekly_mock_'+i, doneKey:'weekly_mock_'+i});
-    } else if(qi < queue.length || carry){
-      // normal day: pull from queue
-      let remaining = capacityMin;
-      while(remaining > 0 && (carry || qi < queue.length)){
-        let task, key, label;
-        if(carry){
-          task = carry.task; label = task.label + (carry.part>1?" (cont'd)":''); key = task.key + (carry.part>1?'_p'+carry.part:'');
-        } else {
-          task = queue[qi]; label = task.label; key = task.key;
+        function showSystemNotice(msg) {
+            const el = document.getElementById('system-notification');
+            if (el) { el.style.display = 'block'; el.innerText = msg; }
         }
-        const need = carry ? carry.remainingMinutes : task.minutes;
-        if(need <= remaining){
-          tasks.push({label, minutes:need, key, doneKey:key});
-          remaining -= need;
-          carry = null; qi++;
-        } else {
-          // split
-          tasks.push({label:label+' (part)', minutes:remaining, key:key+'_split'+i, doneKey:key+'_split'+i});
-          const newPart = carry ? carry.part+1 : 2;
-          carry = {task, remainingMinutes: need-remaining, part:newPart};
-          remaining = 0;
+
+        // Script Loader Array
+        function loadScript(src, next) {
+            const s = document.createElement('script');
+            s.src = src;
+            s.onload = next;
+            s.onerror = () => { showSystemNotice("Critical Failure: All CDN paths blocked. System running in localized offline sandboxed state."); fallbackToLocalSandbox(); };
+            document.head.appendChild(s);
         }
-      }
-      if(tasks.length===0){ dayType='marathon'; }
-    } else {
-      dayType = 'marathon';
-    }
 
-    if(dayType==='marathon'){
-      const subjCycle = SUBJECTS[ (studyDayCounter) % SUBJECTS.length ];
-      tasks = [
-        {label:'Full Mock Test (100 Qs, all subjects)', minutes:Math.round(capacityMin*0.5), key:'mar_mock_'+i, doneKey:'mar_mock_'+i},
-        {label:'Deep Revision: '+subjCycle.name+' (redo every wrong Q so far)', minutes:Math.round(capacityMin*0.5), key:'mar_rev_'+i+'_'+subjCycle.id, doneKey:'mar_rev_'+i+'_'+subjCycle.id},
-      ];
-    }
+        // Configuration Infrastructure Matrix
+        const firebaseConfig = {
+            apiKey: "AIzaSyCNdjwiUGfZU42vFXHvCwNVngiZoiZIzKY",
+            authDomain: "new-ssc-2cc26.firebaseapp.com",
+            projectId: "new-ssc-2cc26",
+            storageBucket: "new-ssc-2cc26.firebasestorage.app",
+            messagingSenderId: "776822239283",
+            appId: "1:776822239283:web:d37d59a277585e82ad3346",
+            measurementId: "G-TVQF9YWLKG"
+        };
 
-    days.push({dayNum:i+1, date:dateISO, type:dayType, tasks});
-  }
-  return days;
-}
+        let db = null;
+        let activeUserId = '';
+        let isLocalSandbox = false;
+        let showOnlyRemaining = false;
 
-/* ======================= RENDER: DASHBOARD ======================= */
-function computeProgress(){
-  let totalTasks=0, doneTasks=0;
-  const bySubj = {};
-  SUBJECTS.forEach(s=> bySubj[s.id] = {total:0, done:0});
-  SCHEDULE.forEach(day=>{
-    day.tasks.forEach(t=>{
-      totalTasks++;
-      if(CHECKS[t.doneKey]) doneTasks++;
-      // attribute to subject if task key maps to a topic
-      const topic = TOPICS.find(tp=> t.doneKey.startsWith(tp.id+'_'));
-      let subj = topic ? topic.s : null;
-      if(!subj){
-        for(const s of SUBJECTS){ if(t.doneKey.indexOf('_'+s.id)!==-1 || t.doneKey.indexOf(s.id+'_')!==-1){ subj=s.id; break; } }
-      }
-      if(subj && bySubj[subj]){
-        bySubj[subj].total++;
-        if(CHECKS[t.doneKey]) bySubj[subj].done++;
-      }
-    });
-  });
-  return {totalTasks, doneTasks, bySubj};
-}
+        // Core Notebook Master Schema Initialization Payload
+        const masterRawSyllabus = [
+            // Non-Technical Maths
+            { id: "nt_hcf", subject: "Non-Tech Maths", topic: "HCF & LCM", lec: 2, qs: 10, mpq: 2 },
+            { id: "nt_pct", subject: "Non-Tech Maths", topic: "Percentage", lec: 2, qs: 19, mpq: 2 },
+            { id: "nt_pl", subject: "Non-Tech Maths", topic: "Profit & Loss", lec: 2, qs: 14, mpq: 2 },
+            { id: "nt_disc", subject: "Non-Tech Maths", topic: "Discount", lec: 2, qs: 9, mpq: 2 },
+            { id: "nt_si", subject: "Non-Tech Maths", topic: "Simple Interest", lec: 2, qs: 18, mpq: 2 },
+            { id: "nt_ci", subject: "Non-Tech Maths", topic: "Compound Interest", lec: 2, qs: 18, mpq: 2 },
+            { id: "nt_tw", subject: "Non-Tech Maths", topic: "Time & Work", lec: 2, qs: 14, mpq: 2 },
+            { id: "nt_wages", subject: "Non-Tech Maths", topic: "Wages", lec: 2, qs: 2, mpq: 2 },
+            { id: "nt_pc", subject: "Non-Tech Maths", topic: "Pipe & Cistern", lec: 2, qs: 5, mpq: 2 },
+            { id: "nt_std", subject: "Non-Tech Maths", topic: "Time/Speed/Distance", lec: 2, qs: 15, mpq: 2 },
+            { id: "nt_trains", subject: "Non-Tech Maths", topic: "Trains", lec: 2, qs: 6, mpq: 2 },
+            { id: "nt_races", subject: "Non-Tech Maths", topic: "Races", lec: 2, qs: 3, mpq: 2 },
+            { id: "nt_cm", subject: "Non-Tech Maths", topic: "Circular Motion", lec: 2, qs: 1, mpq: 2 },
+            { id: "nt_boats", subject: "Non-Tech Maths", topic: "Boats & Streams", lec: 2, qs: 6, mpq: 2 },
+            { id: "nt_ratio", subject: "Non-Tech Maths", topic: "Ratio & Proportion", lec: 2, qs: 11, mpq: 2 },
+            { id: "nt_prop", subject: "Non-Tech Maths", topic: "Proportional Parts", lec: 2, qs: 2, mpq: 2 },
+            { id: "nt_ages", subject: "Non-Tech Maths", topic: "Ages", lec: 2, qs: 2, mpq: 2 },
+            { id: "nt_partner", subject: "Non-Tech Maths", topic: "Partnership", lec: 2, qs: 7, mpq: 2 },
 
-function renderDashboard(){
-  const prog = computeProgress();
-  const pct = prog.totalTasks ? Math.round(100*prog.doneTasks/prog.totalTasks) : 0;
-  document.getElementById('statPct').textContent = pct+'%';
-  document.getElementById('topProgress').style.width = pct+'%';
+            // Advanced Maths
+            { id: "adv_mix", subject: "Advanced Maths", topic: "Mixture & Alligation", lec: 2, qs: 7, mpq: 2 },
+            { id: "adv_nav", subject: "Advanced Maths", topic: "Navigation", lec: 2, qs: 6, mpq: 2 },
+            { id: "adv_avg", subject: "Advanced Maths", topic: "Average", lec: 2, qs: 16, mpq: 2 },
+            { id: "adv_simp", subject: "Advanced Maths", topic: "Simplification", lec: 2, qs: 13, mpq: 2 },
+            { id: "adv_surds", subject: "Advanced Maths", topic: "Surds & Indices", lec: 2, qs: 28, mpq: 2 },
+            { id: "adv_num", subject: "Advanced Maths", topic: "Number System", lec: 2, qs: 4, mpq: 2 },
+            { id: "adv_apgp", subject: "Advanced Maths", topic: "AP & GP", lec: 2, qs: 4, mpq: 2 },
+            { id: "adv_alg", subject: "Advanced Maths", topic: "Algebra", lec: 2, qs: 20, mpq: 2 },
+            { id: "adv_quad", subject: "Advanced Maths", topic: "Quadratic Equation", lec: 2, qs: 2, mpq: 2 },
+            { id: "adv_trig", subject: "Advanced Maths", topic: "Trigonometry", lec: 2, qs: 24, mpq: 2 },
+            { id: "adv_mens", subject: "Advanced Maths", topic: "Mensuration", lec: 2, qs: 20, mpq: 2 },
+            { id: "adv_hd", subject: "Advanced Maths", topic: "Height & Distance", lec: 2, qs: 6, mpq: 2 },
+            { id: "adv_geom", subject: "Advanced Maths", topic: "Geometry", lec: 2, qs: 50, mpq: 2 },
+            { id: "adv_coord", subject: "Advanced Maths", topic: "Coordinate Geometry", lec: 2, qs: 21, mpq: 2 },
+            { id: "adv_prob", subject: "Advanced Maths", topic: "Probability", lec: 2, qs: 9, mpq: 2 },
+            { id: "adv_stats", subject: "Advanced Maths", topic: "Statistics", lec: 2, qs: 5, mpq: 2 },
 
-  const start = SETTINGS.start || todayISO();
-  const today = todayISO();
-  const startD = new Date(start+'T00:00:00'); const todayD = new Date(today+'T00:00:00');
-  const dayOf = Math.max(1, Math.min(SETTINGS.totalDays, Math.floor((todayD-startD)/86400000)+1));
-  document.getElementById('statDayOf').textContent = 'D'+dayOf+'/'+SETTINGS.totalDays;
-  document.getElementById('statLeft').textContent = Math.max(0, SETTINGS.totalDays - dayOf);
+            // Reasoning
+            { id: "re_syll", subject: "Reasoning", topic: "Syllogism", lec: 2, qs: 15, mpq: 1.5 },
+            { id: "re_anal", subject: "Reasoning", topic: "Analogy", lec: 2, qs: 15, mpq: 1.5 },
+            { id: "re_lser", subject: "Reasoning", topic: "Letter Series", lec: 2, qs: 15, mpq: 1.5 },
+            { id: "re_fser", subject: "Reasoning", topic: "Figure Series", lec: 2, qs: 15, mpq: 1.5 },
+            { id: "re_code", subject: "Reasoning", topic: "Coding-Decoding", lec: 2, qs: 15, mpq: 1.5 },
+            { id: "re_blood", subject: "Reasoning", topic: "Blood Relation", lec: 2, qs: 15, mpq: 1.5 },
+            { id: "re_sit", subject: "Reasoning", topic: "Sitting Arrangement", lec: 2, qs: 15, mpq: 1.5 },
+            { id: "re_nser", subject: "Reasoning", topic: "Number Series", lec: 2, qs: 15, mpq: 1.5 },
+            { id: "re_alpser", subject: "Reasoning", topic: "Alphabet Series", lec: 2, qs: 15, mpq: 1.5 },
+            { id: "re_dot", subject: "Reasoning", topic: "Dot Situation", lec: 2, qs: 15, mpq: 1.5 },
+            { id: "re_miss", subject: "Reasoning", topic: "Missing Number", lec: 2, qs: 15, mpq: 1.5 },
+            { id: "re_arg", subject: "Reasoning", topic: "Statement & Argument", lec: 2, qs: 15, mpq: 1.5 },
+            { id: "re_cause", subject: "Reasoning", topic: "Cause & Effect", lec: 2, qs: 15, mpq: 1.5 },
+            { id: "re_assump", subject: "Reasoning", topic: "Statement & Assumption", lec: 2, qs: 15, mpq: 1.5 },
+            { id: "re_concl", subject: "Reasoning", topic: "Statement & Conclusion", lec: 2, qs: 15, mpq: 1.5 },
+            { id: "re_action", subject: "Reasoning", topic: "Course of Action", lec: 2, qs: 15, mpq: 1.5 },
+            { id: "re_datas", subject: "Reasoning", topic: "Data Sufficiency", lec: 2, qs: 15, mpq: 1.5 },
+            { id: "re_ineq", subject: "Reasoning", topic: "Coded Inequality", lec: 2, qs: 15, mpq: 1.5 },
+            { id: "re_dec", subject: "Reasoning", topic: "Decision Making", lec: 2, qs: 15, mpq: 1.5 },
+            { id: "re_puz", subject: "Reasoning", topic: "Puzzle", lec: 2, qs: 15, mpq: 1.5 },
+            { id: "re_io", subject: "Reasoning", topic: "Input-Output", lec: 2, qs: 15, mpq: 1.5 },
 
-  const wrap = document.getElementById('subjectBars');
-  wrap.innerHTML = '';
-  SUBJECTS.forEach(s=>{
-    const b = prog.bySubj[s.id] || {total:0,done:0};
-    const p = b.total ? Math.round(100*b.done/b.total) : 0;
-    const row = document.createElement('div');
-    row.className = 'subject-bar-row';
-    row.innerHTML = `<div class="name"><span class="swatch" style="background:${s.color}"></span>${s.name}</div>
-      <div class="bar-track"><div class="bar-fill" style="width:${p}%;background:${s.color}"></div></div>
-      <div class="pct">${p}%</div>`;
-    wrap.appendChild(row);
-  });
-}
+            // Chemistry
+            { id: "ch_pt", subject: "Chemistry", topic: "Periodic Table", lec: 2, qs: 15, mpq: 1.5 },
+            { id: "ch_mnm", subject: "Chemistry", topic: "Metals & Non-metals", lec: 2, qs: 21, mpq: 1.5 },
+            { id: "ch_at", subject: "Chemistry", topic: "Atomic Structure", lec: 2, qs: 5, mpq: 1.5 },
+            { id: "ch_wat", subject: "Chemistry", topic: "Water", lec: 2, qs: 2, mpq: 1.5 },
+            { id: "ch_carb", subject: "Chemistry", topic: "Carbon & its Compounds", lec: 2, qs: 4, mpq: 1.5 },
+            { id: "ch_abs", subject: "Chemistry", topic: "Acid/Base/Salt", lec: 2, qs: 6, mpq: 1.5 },
+            { id: "ch_det", subject: "Chemistry", topic: "Soap & Detergent", lec: 2, qs: 1, mpq: 1.5 },
+            { id: "ch_mat", subject: "Chemistry", topic: "Matter", lec: 2, qs: 4, mpq: 1.5 },
+            { id: "ch_rad", subject: "Chemistry", topic: "Radioactivity", lec: 2, qs: 2, mpq: 1.5 },
+            { id: "ch_phys", subject: "Chemistry", topic: "Physical Change", lec: 2, qs: 1, mpq: 1.5 },
+            { id: "ch_poly", subject: "Chemistry", topic: "Polymers", lec: 2, qs: 1, mpq: 1.5 },
+            { id: "ch_rxn", subject: "Chemistry", topic: "Chemical Reactions", lec: 2, qs: 5, mpq: 1.5 },
 
-/* ======================= RENDER: SYLLABUS EDITOR ======================= */
-function renderSyllabus(){
-  const body = document.getElementById('sylBody');
-  body.innerHTML = '';
-  let idx = 1;
-  SUBJECTS.forEach(s=>{
-    const head = document.createElement('tr');
-    head.className='subject-head';
-    head.innerHTML = `<td colspan="6" style="color:${s.color}"><span class="swatch" style="background:${s.color}"></span>${s.name}</td>`;
-    body.appendChild(head);
-    TOPICS.filter(t=>t.s===s.id).forEach(t=>{
-      const tr = document.createElement('tr');
-      const totalHrs = (t.lh + (t.q*t.mpq)/60).toFixed(1);
-      tr.innerHTML = `
-        <td style="font-family:var(--font-mono);color:var(--text-dim)">${idx++}</td>
-        <td style="${t.fuzzy?'background:rgba(226,162,59,.12)':''}">${t.n}${t.fuzzy?' <span style="font-size:10px;color:var(--amber)">(unclear in photo)</span>':''}</td>
-        <td><input type="number" step="0.5" min="0" value="${t.lh}" data-id="${t.id}" data-field="lh"></td>
-        <td><input type="number" step="1" min="0" value="${t.q}" data-id="${t.id}" data-field="q"></td>
-        <td><input type="number" step="0.5" min="0.5" value="${t.mpq}" data-id="${t.id}" data-field="mpq"></td>
-        <td style="font-family:var(--font-mono);color:var(--text-dim)">${totalHrs}h</td>`;
-      body.appendChild(tr);
-    });
-  });
-  body.querySelectorAll('input').forEach(inp=>{
-    inp.addEventListener('change', e=>{
-      const id = e.target.dataset.id, field = e.target.dataset.field;
-      const t = TOPICS.find(x=>x.id===id);
-      const val = parseFloat(e.target.value)||0;
-      t[field] = val;
-      renderSyllabus(); // refresh totals
-    });
-  });
-}
+            // Physics
+            { id: "ph_lt", subject: "Physics", topic: "Light", lec: 2, qs: 8, mpq: 1.5 },
+            { id: "ph_mir", subject: "Physics", topic: "Mirror", lec: 2, qs: 2, mpq: 1.5 },
+            { id: "ph_len", subject: "Physics", topic: "Lens", lec: 2, qs: 3, mpq: 1.5 },
+            { id: "ph_col", subject: "Physics", topic: "Primary Colours of Light", lec: 2, qs: 1, mpq: 1.5 },
+            { id: "ph_wav", subject: "Physics", topic: "Waves", lec: 2, qs: 4, mpq: 1.5 },
+            { id: "ph_snd", subject: "Physics", topic: "Sound", lec: 2, qs: 4, mpq: 1.5 },
+            { id: "ph_flm", subject: "Physics", topic: "Force & Laws of Motion", lec: 2, qs: 9, mpq: 1.5 },
+            { id: "ph_gpm", subject: "Physics", topic: "Gravitation & Planetary Motion", lec: 2, qs: 3, mpq: 1.5 },
+            { id: "ph_pm", subject: "Physics", topic: "Projectile Motion", lec: 2, qs: 1, mpq: 1.5 },
+            { id: "ph_sat", subject: "Physics", topic: "Satellite", lec: 2, qs: 2, mpq: 1.5 },
+            { id: "ph_wp", subject: "Physics", topic: "Work & Power", lec: 2, qs: 3, mpq: 1.5 },
+            { id: "ph_ht", subject: "Physics", topic: "Heat & Temperature", lec: 2, qs: 4, mpq: 1.5 },
+            { id: "ph_elec", subject: "Physics", topic: "Electricity (Verified)", lec: 2, qs: 20, mpq: 1.5 },
 
-/* ======================= RENDER: DAY PLANNER ======================= */
-const DAYTYPE_META = {
-  study:   {label:'Study Day', color:'#2f6f62'},
-  weekly:  {label:'Weekly Revision + Mock', color:'#c1652f'},
-  monthly: {label:'Monthly Full Mock', color:'#b3452f'},
-  marathon:{label:'Final Revision Marathon', color:'#4a5a8c'},
-  rest:    {label:'Rest / Buffer', color:'#555'},
-};
+            // Biology
+            { id: "bio_lump", subject: "Biology", topic: "Complete Compendium", lec: 8, qs: 112, mpq: 1.2 },
 
-function renderPlanner(){
-  const list = document.getElementById('dayList');
-  const filter = document.getElementById('filterWeek').value;
-  const today = todayISO();
-  list.innerHTML = '';
-  SCHEDULE.forEach(day=>{
-    if(filter==='remaining' && day.date < today) return;
-    const meta = DAYTYPE_META[day.type] || DAYTYPE_META.study;
-    const card = document.createElement('div');
-    card.className = 'daycard' + (day.type==='rest' ? ' rest':'');
-    card.id = 'day-'+day.dayNum;
-    const dateObj = new Date(day.date+'T00:00:00');
-    const allDone = day.tasks.length>0 && day.tasks.every(t=>CHECKS[t.doneKey]);
-    let bodyHtml = '';
-    if(day.tasks.length===0){
-      bodyHtml = `<div class="daycard-empty">Rest day — light optional revision, or take the day off.</div>`;
-    } else {
-      bodyHtml = '<div class="daycard-body">' + day.tasks.map(t=>{
-        const checked = CHECKS[t.doneKey] ? 'checked' : '';
-        const doneCls = CHECKS[t.doneKey] ? 'done' : '';
-        const hrs = (t.minutes/60);
-        const hrsStr = hrs>=1 ? hrs.toFixed(1)+'h' : Math.round(t.minutes)+'m';
-        return `<div class="task-row ${doneCls}">
-          <input type="checkbox" data-key="${t.doneKey}" ${checked}>
-          <div class="tlabel">${t.label}</div>
-          <div class="tmin">${hrsStr}</div>
-        </div>`;
-      }).join('') + '</div>';
-    }
-    card.innerHTML = `
-      <div class="daycard-head">
-        <div><span class="daynum">DAY ${day.dayNum}</span><br><span class="datestr">${fmtDate(dateObj)}</span></div>
-        <div>${allDone?'<span class="stamp">DONE</span> ':''}<span class="badge" style="background:${meta.color}">${meta.label}</span></div>
-      </div>
-      ${bodyHtml}`;
-    list.appendChild(card);
-  });
-  list.querySelectorAll('input[type=checkbox]').forEach(cb=>{
-    cb.addEventListener('change', async e=>{
-      const key = e.target.dataset.key;
-      CHECKS[key] = e.target.checked;
-      await saveChecks();
-      renderPlanner();
-      renderDashboard();
-    });
-  });
-}
+            // Official Syllabus Gaps Modules
+            { id: "inj_eng", subject: "English Lang", topic: "Grammar Core, Cloze Test & Reading Passages", lec: 12, qs: 150, mpq: 1 },
+            { id: "inj_ga", subject: "General Awareness", topic: "History, Polity, Geography & Current GK", lec: 16, qs: 200, mpq: 1 }
+        ];
 
-/* ======================= TABS ======================= */
-document.querySelectorAll('.tab').forEach(tab=>{
-  tab.addEventListener('click', ()=>{
-    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-    tab.classList.add('active');
-    document.getElementById('view-'+tab.dataset.tab).classList.add('active');
-  });
-});
+        // Runtime State
+        let userDataState = {
+            settings: { hours: 6, daysPerWeek: 6, startDate: "" },
+            topicOverrides: {},
+            checks: {}
+        };
 
-/* ======================= INIT / EVENTS ======================= */
-async function regenerate(){
-  SCHEDULE = generateSchedule();
-  renderDashboard();
-  renderSyllabus();
-  renderPlanner();
-}
+        window.addEventListener('DOMContentLoaded', () => {
+            loadPrimaryFirebase();
+        });
 
-document.getElementById('btnGenerate').addEventListener('click', async ()=>{
-  SETTINGS.start = document.getElementById('setStart').value || todayISO();
-  SETTINGS.daysPerWeek = parseInt(document.getElementById('setDaysPerWeek').value);
-  SETTINGS.hours = parseFloat(document.getElementById('setHours').value);
-  SETTINGS.totalDays = parseInt(document.getElementById('setTotalDays').value);
-  await saveSettings();
-  regenerate();
-});
-document.getElementById('btnSaveSyl').addEventListener('click', async ()=>{
-  await saveTopicOverrides();
-  regenerate();
-  document.querySelector('.tab[data-tab="plan"]').click();
-});
-document.getElementById('btnResetSyl').addEventListener('click', async ()=>{
-  loadDefaultsIntoTopics();
-  await saveTopicOverrides();
-  regenerate();
-});
-document.getElementById('filterWeek').addEventListener('change', renderPlanner);
-document.getElementById('btnJumpToday').addEventListener('click', ()=>{
-  const today = todayISO();
-  const day = SCHEDULE.find(d=>d.date>=today);
-  if(day){ document.getElementById('day-'+day.dayNum).scrollIntoView({behavior:'smooth', block:'start'}); }
-});
+        function loadPrimaryFirebase() {
+            loadScript("https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js", () => {
+                loadScript("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js", () => {
+                    initFirebaseContext();
+                });
+            });
+        }
 
-async function enterApp(){
-  document.getElementById('gate').style.display = 'none';
-  document.getElementById('appRoot').style.display = 'block';
-  document.getElementById('whoami').textContent = currentUserId;
-  document.getElementById('setStart').value = SETTINGS.start || todayISO();
-  document.getElementById('setDaysPerWeek').value = SETTINGS.daysPerWeek;
-  document.getElementById('setHours').value = SETTINGS.hours;
-  document.getElementById('setTotalDays').value = SETTINGS.totalDays;
-  regenerate();
-}
+        function loadFallbackFirebase() {
+            showSystemNotice("Re-routing Firebase SDK initialization through structural mirror CDN networks...");
+            loadScript("https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.js", () => {
+                loadScript("https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-firestore-compat.js", () => {
+                    initFirebaseContext();
+                });
+            });
+        }
 
-async function handleLogin(rawId){
-  const msg = document.getElementById('gateMsg');
-  if(window.__fbLoadFailed || !firebaseReady){
-    msg.className = 'gateMsg err';
-    msg.textContent = "Couldn't load the sync service (blocked by an ad-blocker/extension, or no internet). Try disabling any blocker for this site, check your connection, then reload.";
-    return;
-  }
-  const userId = sanitizeUserId(rawId);
-  if(!userId){
-    msg.className = 'gateMsg err'; msg.textContent = 'Type a name or ID first.';
-    return;
-  }
-  msg.className = 'gateMsg'; msg.textContent = 'Connecting…';
-  document.getElementById('gateBtn').disabled = true;
-  try{
-    currentUserId = userId;
-    await loadAll();
-    localStorage.setItem(LAST_USER_KEY, userId);
-    msg.className = 'gateMsg ok'; msg.textContent = 'Loaded.';
-    await enterApp();
-  }catch(e){
-    console.error(e);
-    msg.className = 'gateMsg err';
-    const code = e && e.code;
-    if(code === 'permission-denied'){
-      msg.textContent = "Permission denied — your Firestore security rules aren't published yet (see README step 1).";
-    } else if(code === 'unavailable' || /offline/i.test(e && e.message || '')){
-      msg.textContent = "Can't reach the database. Most likely: the Firestore database itself hasn't been created yet in your Firebase console (README step 1) — a project alone isn't enough. Could also be a VPN/proxy/ad-blocker blocking it; try a normal network or incognito.";
-    } else if(code === 'not-found'){
-      msg.textContent = "Database not found — go to Firebase console → Firestore Database → Create database (README step 1), then reload.";
-    } else {
-      msg.textContent = "Couldn't reach the database (" + (code || 'unknown error') + "). Check the Firestore setup in the README.";
-    }
-    document.getElementById('gateBtn').disabled = false;
-  }
-}
+        function initFirebaseContext() {
+            try {
+                if (firebase.apps.length === 0) {
+                    firebase.initializeApp(firebaseConfig);
+                }
+                
+                db = firebase.firestore();
+                db.settings({ 
+                    experimentalAutoDetectLongPolling: true,
+                    merge: true 
+                });
+                
+                console.log("Firebase storage arrays established successfully.");
+                
+                const cachedUid = localStorage.getItem('ssc_cgl_command_uid');
+                if (cachedUid) {
+                    document.getElementById('uid-input').value = cachedUid;
+                    initSession();
+                }
+            } catch (err) {
+                showSystemNotice("Database Pipeline Error: Initialization array blocked. Routing execution into standalone browser storage.");
+                fallbackToLocalSandbox();
+            }
+        }
 
-document.getElementById('gateBtn').addEventListener('click', ()=>{
-  handleLogin(document.getElementById('gateInput').value);
-});
-document.getElementById('gateInput').addEventListener('keydown', e=>{
-  if(e.key==='Enter') handleLogin(e.target.value);
-});
-document.getElementById('btnSwitchUser').addEventListener('click', ()=>{
-  document.getElementById('appRoot').style.display = 'none';
-  document.getElementById('gate').style.display = 'flex';
-  document.getElementById('gateMsg').textContent = '';
-  document.getElementById('gateBtn').disabled = false;
-  document.getElementById('gateInput').value = '';
-  currentUserId = null;
-});
+        function fallbackToLocalSandbox() {
+            isLocalSandbox = true;
+            document.getElementById('active-uid-display').innerText = "LOCAL_SANDBOX_OFFLINE";
+            const cachedUid = localStorage.getItem('ssc_cgl_command_uid') || 'offline_user';
+            document.getElementById('uid-input').value = cachedUid;
+        }
 
-function initGate(){
-  if(window.__fbLoadFailed){
-    const msg = document.getElementById('gateMsg');
-    msg.className = 'gateMsg err';
-    msg.textContent = "Couldn't load the sync service (blocked by an ad-blocker/extension, or no internet). Try disabling any blocker for this site, check your connection, then reload.";
-    document.getElementById('gateBtn').disabled = true;
-    return;
-  }
-  initFirebase();
-  if(!firebaseReady){
-    const msg = document.getElementById('gateMsg');
-    msg.className = 'gateMsg err';
-    msg.textContent = 'Firebase failed to start — double-check the firebaseConfig values match your project.';
-    document.getElementById('gateBtn').disabled = true;
-    return;
-  }
-  const remembered = localStorage.getItem(LAST_USER_KEY);
-  if(remembered){
-    document.getElementById('gateInput').value = remembered;
-    document.getElementById('gateSub').textContent = 'Welcome back — resuming your plan automatically.';
-    handleLogin(remembered);
-  }
-}
+        function initSession() {
+            const rawUid = document.getElementById('uid-input').value.trim();
+            if (!rawUid) { alert("An operational ID string is required."); return; }
+            activeUserId = rawUid.toLowerCase().replace(/[^a-z0-9-_]/g, '');
+            
+            localStorage.setItem('ssc_cgl_command_uid', activeUserId);
+            document.getElementById('active-uid-display').innerText = activeUserId;
+            document.getElementById('gate-screen').style.display = 'none';
 
-if(window.__fbReady || window.__fbLoadFailed){
-  // loader already settled before this script ran (rare, fast network)
-  initGate();
-} else {
-  window.addEventListener('fb-scripts-settled', initGate, {once:true});
-}
-</script>
+            if (isLocalSandbox) {
+                loadLocalData();
+            } else {
+                fetchUserDataFirestore();
+            }
+        }
+
+        function logoutSession() {
+            localStorage.removeItem('ssc_cgl_command_uid');
+            location.reload();
+        }
+
+        function fetchUserDataFirestore() {
+            const docRef = db.collection("plans").doc(activeUserId);
+            docRef.get().then((doc) => {
+                if (doc.exists) {
+                    userDataState = doc.data();
+                    if (!userDataState.checks) userDataState.checks = {};
+                    if (!userDataState.topicOverrides) userDataState.topicOverrides = {};
+                } else {
+                    const todayStr = new Date().toISOString().split('T')[0];
+                    userDataState = {
+                        settings: { hours: 6, daysPerWeek: 6, startDate: todayStr },
+                        topicOverrides: {},
+                        checks: {}
+                    };
+                    docRef.set(userDataState).catch(e => {
+                        showSystemNotice("Permission Denied: Confirm Cloud Firestore rules configuration matches deployment criteria.");
+                    });
+                }
+                syncInterfaceSettings();
+                generateSyllabusConfigTable();
+                processScheduleEngine();
+            }).catch((error) => {
+                showSystemNotice("Network Handshake Interrupted: " + error.message + ". Reverting data arrays to local state.");
+                isLocalSandbox = true;
+                loadLocalData();
+            });
+        }
+
+        function loadLocalData() {
+            const localData = localStorage.getItem(`bak_plan_${activeUserId}`);
+            if (localData) {
+                userDataState = JSON.parse(localData);
+            } else {
+                const todayStr = new Date().toISOString().split('T')[0];
+                userDataState = {
+                    settings: { hours: 6, daysPerWeek: 6, startDate: todayStr },
+                    topicOverrides: {},
+                    checks: {}
+                };
+            }
+            syncInterfaceSettings();
+            generateSyllabusConfigTable();
+            processScheduleEngine();
+        }
+
+        function persistUserData() {
+            userDataState.updatedAt = new Date().toISOString();
+            if (isLocalSandbox) {
+                localStorage.setItem(`bak_plan_${activeUserId}`, JSON.stringify(userDataState));
+                processScheduleEngine();
+            } else {
+                db.collection("plans").doc(activeUserId).set(userDataState)
+                    .then(() => { processScheduleEngine(); })
+                    .catch((e) => {
+                        showSystemNotice("Write Interrupted: Buffering parameters internally. Error: " + e.message);
+                        localStorage.setItem(`bak_plan_${activeUserId}`, JSON.stringify(userDataState));
+                        processScheduleEngine();
+                    });
+            }
+        }
+
+        function syncInterfaceSettings() {
+            document.getElementById('cfg-hours').value = userDataState.settings.hours || 6;
+            document.getElementById('cfg-days-week').value = userDataState.settings.daysPerWeek || 6;
+        }
+
+        function generateSyllabusConfigTable() {
+            const tbody = document.getElementById('config-table-body');
+            tbody.innerHTML = '';
+            
+            masterRawSyllabus.forEach(item => {
+                const override = userDataState.topicOverrides[item.id] || {};
+                const lecVal = override.lec !== undefined ? override.lec : item.lec;
+                const qsVal = override.qs !== undefined ? override.qs : item.qs;
+                const mpqVal = override.mpq !== undefined ? override.mpq : item.mpq;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="color:#FFF;"><strong>[${item.subject}]</strong><br>${item.topic}</td>
+                    <td><input type="number" step="0.5" min="0" value="${lecVal}" onchange="updateOverride('${item.id}', 'lec', this.value)"></td>
+                    <td><input type="number" min="0" value="${qsVal}" onchange="updateOverride('${item.id}', 'qs', this.value)"></td>
+                    <td><input type="number" step="0.1" min="0" value="${mpqVal}" onchange="updateOverride('${item.id}', 'mpq', this.value)"></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateOverride(topicId, key, value) {
+            if (!userDataState.topicOverrides[topicId]) userDataState.topicOverrides[topicId] = {};
+            userDataState.topicOverrides[topicId][key] = parseFloat(value) || 0;
+            persistUserData();
+        }
+
+        function triggerRecalc() {
+            userDataState.settings.hours = parseFloat(document.getElementById('cfg-hours').value) || 6;
+            userDataState.settings.daysPerWeek = parseInt(document.getElementById('cfg-days-week').value) || 6;
+            persistUserData();
+        }
+
+        function processScheduleEngine() {
+            const dailyHours = userDataState.settings.hours;
+            const daysPerWeek = userDataState.settings.daysPerWeek;
+            
+            let baseDate = new Date();
+            if (userDataState.settings.startDate) {
+                baseDate = new Date(userDataState.settings.startDate);
+            } else {
+                userDataState.settings.startDate = baseDate.toISOString().split('T')[0];
+            }
+
+            let taskQueue = [];
+            let subjectGroups = {};
+
+            masterRawSyllabus.forEach(item => {
+                const override = userDataState.topicOverrides[item.id] || {};
+                const lec = override.lec !== undefined ? override.lec : item.lec;
+                const qs = override.qs !== undefined ? override.qs : item.qs;
+                const mpq = override.mpq !== undefined ? override.mpq : item.mpq;
+                
+                const practiceHours = (qs * mpq) / 60;
+
+                if (!subjectGroups[item.subject]) subjectGroups[item.subject] = [];
+                
+                subjectGroups[item.subject].push({
+                    id: item.id,
+                    topic: item.topic,
+                    lecHours: lec,
+                    pracHours: practiceHours,
+                    qsCount: qs
+                });
+            });
+
+            for (const subject in subjectGroups) {
+                subjectGroups[subject].forEach(topic => {
+                    if (topic.lecHours > 0) {
+                        taskQueue.push({ type: 'lec', id: topic.id, sub: subject, label: `Lecture: ${topic.topic}`, hours: topic.lecHours });
+                    }
+                    if (topic.pracHours > 0) {
+                        taskQueue.push({ type: 'prac', id: topic.id, sub: subject, label: `Practice Drill: ${topic.topic} (${topic.qsCount} Qs)`, hours: topic.pracHours });
+                    }
+                });
+                taskQueue.push({ type: 'section_rev', id: `rev_${subject.toLowerCase().replace(/[^a-z]/g,'')}`, sub: subject, label: `Sectional Review + Strategy Revision [${subject}]`, hours: 4 });
+            }
+
+            let trackingDays = [];
+            let currentDayIdx = 1;
+            let totalCalendarDaysCount = 0;
+            let loopSafetyCounter = 0;
+            let currentDayTasks = [];
+
+            const totalTargetDaysCount = 90; 
+
+            while ((taskQueue.length > 0 || currentDayTasks.length > 0 || totalCalendarDaysCount < totalTargetDaysCount) && loopSafetyCounter < 2000) {
+                loopSafetyCounter++;
+                totalCalendarDaysCount++;
+
+                let targetCalendarDate = new Date(baseDate);
+                targetCalendarDate.setDate(baseDate.getDate() + (totalCalendarDaysCount - 1));
+                let dayOfWeekIndex = targetCalendarDate.getDay(); 
+
+                let restAllocationHit = false;
+                if (daysPerWeek === 6 && dayOfWeekIndex === 0) restAllocationHit = true; 
+                if (daysPerWeek === 5 && (dayOfWeekIndex === 0 || dayOfWeekIndex === 6)) restAllocationHit = true;
+
+                if (restAllocationHit) {
+                    trackingDays.push({
+                        dayNum: totalCalendarDaysCount,
+                        studyDayNum: null,
+                        dateStr: targetCalendarDate.toDateString(),
+                        type: 'REST',
+                        tasks: [{ uid: 'rest_buffer', label: "Rest Cycle / Buffer catching backup tasks", done: false, hours: dailyHours }]
+                    });
+                    continue; 
+                }
+
+                let scheduleType = 'STUDY';
+                let capacityForDay = dailyHours;
+                let overrideTasks = [];
+
+                if (currentDayIdx > 0 && currentDayIdx % 28 === 0) {
+                    scheduleType = 'MOCK';
+                    overrideTasks = [
+                        { uid: `mock_f_${currentDayIdx}`, label: "Full-Length Exam Mock Simulation (Tier-I/II Split)", hrs: 3 },
+                        { uid: `mock_a_${currentDayIdx}`, label: "Detailed Metric Review & Strategic Error Logging", hrs: Math.max(1, dailyHours - 3) }
+                    ];
+                } else if (currentDayIdx > 0 && currentDayIdx % 7 === 0) {
+                    scheduleType = 'WEEKLY_REV';
+                    overrideTasks = [
+                        { uid: `week_rev_${currentDayIdx}`, label: "Weekly Cross-Subject Spaced Repetition Drill", hrs: Math.max(1, dailyHours - 2) },
+                        { uid: `week_mock_${currentDayIdx}`, label: "Mini Mock Test Matrix Execution", hrs: 2 }
+                    ];
+                }
+
+                if (overrideTasks.length > 0) {
+                    trackingDays.push({
+                        dayNum: totalCalendarDaysCount,
+                        studyDayNum: currentDayIdx,
+                        dateStr: targetCalendarDate.toDateString(),
+                        type: scheduleType,
+                        tasks: overrideTasks.map(t => ({
+                            uid: t.uid,
+                            label: t.label,
+                            hours: t.hrs,
+                            done: !!userDataState.checks[t.uid]
+                        }))
+                    });
+                    currentDayIdx++;
+                    continue;
+                }
+
+                let activeDayAllocationLoad = [];
+                let availableTimeBalance = dailyHours;
+
+                while (availableTimeBalance > 0.05 && (taskQueue.length > 0 || currentDayTasks.length > 0)) {
+                    let activeTask = currentDayTasks.shift() || taskQueue.shift();
+                    if (!activeTask) break;
+
+                    let uniqueTaskUid = `${activeTask.type}_${activeTask.id}`;
+                    if (activeTask.isContinuation) {
+                        uniqueTaskUid += `_cont_${activeTask.contIdx}`;
+                    }
+
+                    if (activeTask.hours <= availableTimeBalance) {
+                        activeDayAllocationLoad.push({
+                            uid: uniqueTaskUid,
+                            label: activeTask.label,
+                            hours: activeTask.hours,
+                            done: !!userDataState.checks[uniqueTaskUid]
+                        });
+                        availableTimeBalance -= activeTask.hours;
+                    } else {
+                        let operationalFraction = availableTimeBalance;
+                        let remainderFraction = activeTask.hours - availableTimeBalance;
+
+                        activeDayAllocationLoad.push({
+                            uid: uniqueTaskUid,
+                            label: `${activeTask.label}`,
+                            hours: operationalFraction,
+                            done: !!userDataState.checks[uniqueTaskUid]
+                        });
+
+                        let nextContIndex = (activeTask.contIdx || 0) + 1;
+                        currentDayTasks.push({
+                            type: activeTask.type,
+                            id: activeTask.id,
+                            sub: activeTask.sub,
+                            label: `${activeTask.label} (cont'd)`,
+                            hours: remainderFraction,
+                            isContinuation: true,
+                            contIdx: nextContIndex
+                        });
+                        availableTimeBalance = 0;
+                    }
+                }
+
+                if (activeDayAllocationLoad.length === 0 && taskQueue.length === 0) {
+                    scheduleType = 'MARATHON';
+                    let cyclingSubjects = ["Non-Tech Maths", "Advanced Maths", "Reasoning", "Chemistry", "Physics", "Biology", "English Lang", "General Awareness"];
+                    let currentSubjectTargetIndex = currentDayIdx % cyclingSubjects.length;
+                    let targetSubjectString = cyclingSubjects[currentSubjectTargetIndex];
+
+                    activeDayAllocationLoad = [
+                        { uid: `mar_mock_${currentDayIdx}`, label: "High-Yield Tier Mock Test Drill", hours: 2, done: !!userDataState.checks[`mar_mock_${currentDayIdx}`] },
+                        { uid: `mar_rev_${currentDayIdx}`, label: `Deep Subject Review: Focus [${targetSubjectString}]`, hours: Math.max(1, dailyHours - 2), done: !!userDataState.checks[`mar_rev_${currentDayIdx}`] }
+                    ];
+                }
+
+                trackingDays.push({
+                    dayNum: totalCalendarDaysCount,
+                    studyDayNum: currentDayIdx,
+                    dateStr: targetCalendarDate.toDateString(),
+                    type: scheduleType,
+                    tasks: activeDayAllocationLoad
+                });
+
+                currentDayIdx++;
+            }
+
+            renderInterfaceComponents(trackingDays);
+        }
+
+        function renderInterfaceComponents(trackingDays) {
+            const container = document.getElementById('day-grid');
+            container.innerHTML = '';
+
+            let structuralGlobalTotalCount = 0;
+            let structuralGlobalCheckedCount = 0;
+
+            let subjectTotalsMap = {};
+            subjectTotalsMap["Non-Tech Maths"] = { total: 0, done: 0 };
+            subjectTotalsMap["Advanced Maths"] = { total: 0, done: 0 };
+            subjectTotalsMap["Reasoning"] = { total: 0, done: 0 };
+            subjectTotalsMap["Chemistry"] = { total: 0, done: 0 };
+            subjectTotalsMap["Physics"] = { total: 0, done: 0 };
+            subjectTotalsMap["Biology"] = { total: 0, done: 0 };
+            subjectTotalsMap["English Lang"] = { total: 0, done: 0 };
+            subjectTotalsMap["General Awareness"] = { total: 0, done: 0 };
+
+            const currentEstTodayStr = new Date().toDateString();
+            let matchedTodayIndexId = null;
+
+            trackingDays.forEach(day => {
+                if (day.dayNum > 90) return; 
+
+                let dayIsWhollyCompleted = true;
+                if (day.type === 'REST') dayIsWhollyCompleted = false;
+
+                let generatedTaskHtmlString = '';
+
+                day.tasks.forEach(task => {
+                    if (day.type !== 'REST') {
+                        structuralGlobalTotalCount++;
+                        if (task.done) structuralGlobalCheckedCount++;
+
+                        let lookupSubject = getSubjectScopeByUid(task.uid);
+                        if (lookupSubject && subjectTotalsMap[lookupSubject]) {
+                            subjectTotalsMap[lookupSubject].total++;
+                            if (task.done) {
+                                subjectTotalsMap[lookupSubject].done++;
+                            }
+                        }
+                    }
+
+                    if (!task.done && day.type !== 'REST') dayIsWhollyCompleted = false;
+
+                    const checkedStatusAttribute = task.done ? 'checked' : '';
+                    const localizedClassDone = task.done ? 'task-item done' : 'task-item';
+
+                    if (day.type === 'REST') {
+                        generatedTaskHtmlString += `
+                            <div class="task-item" style="color:#7F8C8D; font-style:italic;">
+                                ☕ ${task.label}
+                            </div>
+                        `;
+                    } else {
+                        generatedTaskHtmlString += `
+                            <div class="${localizedClassDone}">
+                                <input type="checkbox" class="task-checkbox" ${checkedStatusAttribute} 
+                                    onclick="toggleTaskProcessing('${task.uid}', this.checked)">
+                                <span>[${task.hours.toFixed(1)}H] ${task.label}</span>
+                            </div>
+                        `;
+                    }
+                });
+
+                if (day.tasks.length === 0) dayIsWhollyCompleted = false;
+
+                let badgeThemeClass = 'badge-study';
+                if (day.type === 'WEEKLY_REV') badgeThemeClass = 'badge-rev';
+                if (day.type === 'MOCK') badgeThemeClass = 'badge-mock';
+                if (day.type === 'MARATHON') badgeThemeClass = 'badge-mara';
+                if (day.type === 'REST') badgeThemeClass = 'badge-rest';
+
+                const ledgerStylingClass = dayIsWhollyCompleted ? 'ledger-page all-done' : 'ledger-page';
+                const hiddenDisplayClassFilter = (showOnlyRemaining && dayIsWhollyCompleted) ? 'display:none;' : '';
+
+                if (day.dateStr === currentEstTodayStr) {
+                    matchedTodayIndexId = `ledger-day-card-${day.dayNum}`;
+                }
+
+                const cardDivElement = document.createElement('div');
+                cardDivElement.id = `ledger-day-card-${day.dayNum}`;
+                cardDivElement.className = ledgerStylingClass;
+                cardDivElement.style = hiddenDisplayClassFilter;
+                
+                cardDivElement.innerHTML = `
+                    <div class="completed-stamp">PASSED</div>
+                    <div class="ledger-header">
+                        <div>
+                            <span style="font-size:18px; font-weight:bold;">DAY ${String(day.dayNum).padStart(2, '0')}</span>
+                            ${day.studyDayNum ? `<span style="font-size:11px; color:#777; margin-left:5px;">(Study Day ${day.studyDayNum})</span>` : ''}
+                        </div>
+                        <span class="badge ${badgeThemeClass}">${day.type}</span>
+                        <div class="ledger-date">${day.dateStr}</div>
+                    </div>
+                    <div class="task-list">
+                        ${generatedTaskHtmlString}
+                    </div>
+                `;
+                container.appendChild(cardDivElement);
+            });
+
+            const globalProgressPercentage = structuralGlobalTotalCount > 0 ? (structuralGlobalCheckedCount / structuralGlobalTotalCount) * 100 : 0;
+            document.getElementById('global-progress-fill').style.width = `${globalProgressPercentage}%`;
+            
+            let executedCalculatedPassedCount = 0;
+            trackingDays.forEach(d => {
+                if (d.dayNum <= 90) {
+                    let checkingCard = document.getElementById(`ledger-day-card-${d.dayNum}`);
+                    if (checkingCard && checkingCard.classList.contains('all-done')) {
+                        executedCalculatedPassedCount++;
+                    }
+                }
+            });
+            
+            document.getElementById('countdown-text').innerText = `Day ${executedCalculatedPassedCount} / 90 Days`;
+
+            const stackContainer = document.getElementById('subject-progress-stack');
+            stackContainer.innerHTML = '';
+            
+            for (const keySubject in subjectTotalsMap) {
+                const metric = subjectTotalsMap[keySubject];
+                const subjectPercentage = metric.total > 0 ? (metric.done / metric.total) * 100 : 0;
+                
+                const blockRow = document.createElement('div');
+                blockRow.className = 'subject-progress-row';
+                blockRow.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; width:100%;">
+                        <span style="color:#D1D5DB;">${keySubject}</span>
+                        <span style="font-family:monospace; color:var(--accent-amber);">${Math.round(subjectPercentage)}%</span>
+                    </div>
+                    <div class="subject-mini-bar">
+                        <div class="subject-mini-fill" style="width: ${subjectPercentage}%;"></div>
+                    </div>
+                `;
+                stackContainer.appendChild(blockRow);
+            }
+
+            window.activeTodayElementId = matchedTodayIndexId;
+        }
+
+        function getSubjectScopeByUid(uid) {
+            if (uid.startsWith('lec_') || uid.startsWith('prac_')) {
+                let segmentToken = uid.replace('lec_', '').replace('prac_', '');
+                if (segmentToken.indexOf('_cont_') !== -1) {
+                    segmentToken = segmentToken.split('_cont_')[0];
+                }
+                let foundItem = masterRawSyllabus.find(x => x.id === segmentToken);
+                return foundItem ? foundItem.subject : null;
+            }
+            return null;
+        }
+
+        function toggleTaskProcessing(taskUid, isChecked) {
+            if (isChecked) {
+                userDataState.checks[taskUid] = true;
+            } else {
+                delete userDataState.checks[taskUid];
+            }
+            persistUserData();
+        }
+
+        function toggleRemainingFilter() {
+            showOnlyRemaining = !showOnlyRemaining;
+            const btn = document.getElementById('toggle-filter-btn');
+            btn.innerText = showOnlyRemaining ? "Show Complete Schedule" : "Show Outstanding Only";
+            processScheduleEngine();
+        }
+
+        function jumpToToday() {
+            if (window.activeTodayElementId) {
+                const targetElement = document.getElementById(window.activeTodayElementId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    targetElement.style.borderRight = "4px solid var(--accent-amber)";
+                    setTimeout(() => { targetElement.style.borderRight = "none"; }, 3000);
+                }
+            } else {
+                alert("Today's date calendar track falls outside the active 90-day scope allocation matrices.");
+            }
+        }
+    </script>
 </body>
 </html>
